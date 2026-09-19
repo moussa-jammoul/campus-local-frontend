@@ -10,8 +10,4 @@ class RefreshListenAbleRouterNotifier extends ChangeNotifier {
   void _listenToAuthState(Ref ref){
     //TODO listen to auth state
   }
-
-
-  
-
 }

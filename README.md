@@ -1,6 +1,6 @@
 # flutterfrontenduniprojectmanager
 
-A new Flutter project , the frontend for "Campus Local," built for Lebanese university students. Free and open-source, with a fast and interactive UI. A local-first application to manage students' semesters, courses, media (videos, images, files), deadlines, and calendars, synced with an external database.
+A new Flutter project , the frontend for "Campus Local" project , built for Lebanese university students. Free and open-source, with a fast and interactive UI. A local-first application to manage students' semesters, courses, media (videos, images, files), deadlines, and calendars, synced with an external database.
 
 ## Quick Notes
 
