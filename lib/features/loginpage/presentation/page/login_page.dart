@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation/widgets/footer.dart';
+import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation/widgets/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation/widgets/graduate_lottie.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation/widgets/loginText.dart';
+
 
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -12,6 +15,10 @@ class LoginPage extends ConsumerStatefulWidget {
 }
 
 class _LoginPageState extends ConsumerState<LoginPage> {
+  
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  late Size sizeDevice;
 
   @override
   void initState() {
@@ -19,7 +26,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    sizeDevice = MediaQuery.of(context).size;
+  }
+
+  @override
   void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
@@ -27,14 +42,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body:
-      Center(child:SingleChildScrollView(
+      Center(child:
+      SingleChildScrollView(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                  children: [
                   GraduateLottie(),
                   Logintext(),
-                  //TODO : make a form (container squished to up) with columns sign in , create account , sign in with google
-                  //with information and author of the project
-    
+                  const SizedBox(height: 20,),
+                  FormOFLogIn(deviceSize: sizeDevice,emailController: emailController,passwordController: passwordController,),
+                  const SizedBox(height: 6,),
+                  ProjectInfoFooter(),       
                  ],
           ),
 )
