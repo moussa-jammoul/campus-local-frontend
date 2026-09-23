@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
+import 'package:flutterfrontenduniprojectmanager/features/loginpage/data/login_api_firebase.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation/errors/providers/create_account_errors.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation/errors/providers/sign_in_errors.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/service/login_service_domain.dart';
@@ -24,7 +25,14 @@ class LoginService extends Notifier<void> implements LoginServiceDomain {
     }
     ref.read(createAccountErrorsProvider.notifier).removeError();
 
-    // TODO: implement createAccount
+    final cred = await ref.read(loginApiProvider.notifier).createAccount(email, password);
+
+    if(cred == null){
+      ref.read(createAccountErrorsProvider.notifier).customError('An error occurred while creating your account. The email may already be in use, or you may have lost connection while creating the account. Please try again later.');
+      throw Error();// again we need to to prevent the bottom sheet to be closed
+    }
+
+    //TODO : pushing the needed data into a riverpod state so after the user verify his email succefly we create the user data and device tokens (if he accepted notifications to be pushed)
     
     
   }
@@ -39,13 +47,32 @@ class LoginService extends Notifier<void> implements LoginServiceDomain {
       return;
     }
     ref.read(emailPasswordErrorsProvider.notifier).removeError();
-    //TODO: implement signIn
+    final cred = await ref.read(loginApiProvider.notifier).signIn(email, password);
+    if(cred == null){
+      ref.read(createAccountErrorsProvider.notifier).customError('An error occurred while signing in. The email may not exist as a user, or you may have lost connection while signing in. Please try again later.');
+      return ;
+    }
+
+    
+
   }
 
   @override
   Future<void> signInWithGoogle() async {
     logger.i("signing in with google !");
-     //TODO: implement sigin with google
+    final cred = await ref.read(loginApiProvider.notifier).signInWithGoogle();
+    if(cred == null){
+      ref.read(emailPasswordErrorsProvider.notifier).customError('failed to sign in with google');
+      logger.e("failed to signing in with google");
+      return;
+    } 
+
+    if(cred.additionalUserInfo!.isNewUser){
+      //TODO : showing a page for the additional data required and pushing them to the riverpod additional data
+    }
+
+    
+
     
   }
 

@@ -171,7 +171,6 @@ class _CreateAccountSheetState extends ConsumerState<CreateAccountSheet> {
                   decoration: const InputDecoration(labelText: 'Role'),
                   items: const [
                     DropdownMenuItem(value: 'student', child: Text('Student')),
-                    DropdownMenuItem(value: 'ta', child: Text('Teaching Assistant')),
                     DropdownMenuItem(value: 'professor', child: Text('Professor')),
                   ],
                   onChanged: (value) => setState(() => _role = value ?? 'student'),

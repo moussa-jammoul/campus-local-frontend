@@ -48,8 +48,10 @@ class RouterRedirectLogique extends Notifier<void> {
         logger.i('email not verified and not on /waitingToVerify -> redirecting to /waitingToVerify');
         return '/waitingToVerify';
       }
+     
       if(emailVerified && isOnVerifyPage){
         logger.i('email verified but on /waitingToVerify -> redirecting to /home');
+      
         return '/home';
       }
       logger.d('emailVerificationRedirect: no redirect needed');

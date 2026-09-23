@@ -42,6 +42,8 @@ dependencies:
   logger: ^2.8.0
   lottie: ^3.6.1
   url_launcher: ^6.3.2
+  cloud_firestore: ^6.10.0
+  google_fonts: ^8.2.1
 
 dev_dependencies:
   flutter_test:
