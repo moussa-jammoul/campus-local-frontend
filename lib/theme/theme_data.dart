@@ -1,14 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// GitHub-inspired theme, covering both light and dark mode.
-/// Wire this up in MaterialApp as:
-///
-/// MaterialApp.router(
-///   theme: GithubTheme.light,
-///   darkTheme: GithubTheme.dark,
-///   themeMode: ThemeMode.system, // <- follows device setting automatically
-///   routerConfig: router,
-/// )
+
 
 class ColorsData {
   // ---- Light mode palette ----

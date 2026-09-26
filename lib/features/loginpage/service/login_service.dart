@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/userAdditionalData/additionalDataFromLogin/addional_data_from_login.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/userAdditionalData/additionalDataFromLogin/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/data/login_api_firebase.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation/errors/providers/create_account_errors.dart';
@@ -15,7 +18,7 @@ class LoginService extends Notifier<void> implements LoginServiceDomain {
   }
   
   @override
-  Future<void> createAccount(String email, String password, String passwordRepeated, String fullName, String? dateOfBirth, String role, String major) async{
+  Future<void> createAccount(String email, String password, String passwordRepeated, String fullName, String dateOfBirth, String role, String major) async{
     
     logger.i("creating account !");
     final valid = _validateCreateAccount(email, password, passwordRepeated, fullName, dateOfBirth, major);
@@ -31,8 +34,9 @@ class LoginService extends Notifier<void> implements LoginServiceDomain {
       ref.read(createAccountErrorsProvider.notifier).customError('An error occurred while creating your account. The email may already be in use, or you may have lost connection while creating the account. Please try again later.');
       throw Error();// again we need to to prevent the bottom sheet to be closed
     }
-
-    //TODO : pushing the needed data into a riverpod state so after the user verify his email succefly we create the user data and device tokens (if he accepted notifications to be pushed)
+    if(FirebaseAuth.instance.currentUser != null){
+    ref.read(additionalDataFromLoginProvider.notifier).addNewData(UserAdditionalData(uid: FirebaseAuth.instance.currentUser!.uid, email: email, fullname: fullName, dateOfBirth: dateOfBirth, role: role, major: major));
+    }
     
     
   }
@@ -66,18 +70,13 @@ class LoginService extends Notifier<void> implements LoginServiceDomain {
       logger.e("failed to signing in with google");
       return;
     } 
-
-    if(cred.additionalUserInfo!.isNewUser){
-      //TODO : showing a page for the additional data required and pushing them to the riverpod additional data
-    }
-
-    
-
+    ///no need her to do anything if new account , everything handled automatically to show the page for 
+    ///additional data to insert them by user
     
   }
 
-  bool _validateCreateAccount(String email, String password, String passwordRepeated, String fullName, String? dateOfBirth, String major){
-    if(email == '' || password == '' || passwordRepeated == '' || fullName == '' || dateOfBirth == null || major == ''){
+  bool _validateCreateAccount(String email, String password, String passwordRepeated, String fullName, String dateOfBirth, String major){
+    if(email == '' || password == '' || passwordRepeated == '' || fullName == '' || dateOfBirth == '0-00-0000' || major == ''){
       ref.read(createAccountErrorsProvider.notifier).showEmptyDataError();
       return false;
           

@@ -39,21 +39,23 @@ class VerifyEmailService extends Notifier<void> implements VerifyEmailServiceDom
   Future<void> resendEmail() async{
     logger.i("resending email to the user...");
     if(ref.read(timerProviderSendingEmailVer.notifier).waiting()){
+      logger.i("still waiting to the couldown of the timer");
       return;
     }
     
     try{
-    ref.read(verfiyEmailApiProvider.notifier).resendEmail();
+    await ref.read(verfiyEmailApiProvider.notifier).resendEmail();
     ref.read(resendEmailVerificationErrorProvider.notifier).removeError();
     ref.read(timerProviderSendingEmailVer.notifier).startTimerAndCancelIt();
     } on FirebaseAuthException catch(e){
-    if (e.code == 'too-many-requests') {
-      logger.e("to many request happened");
+      if(e.code =='too-many-requests'){
+      logger.e(e.message);
       ref.read(resendEmailVerificationErrorProvider.notifier).showRateLimitError();
-    } 
-    else{
-      ref.read(resendEmailVerificationErrorProvider.notifier).showNetworkError();
-    }
+      }else {
+    logger.e(e.message);
+    ref.read(resendEmailVerificationErrorProvider.notifier).showNetworkError();
+  }
+
     }
 
     

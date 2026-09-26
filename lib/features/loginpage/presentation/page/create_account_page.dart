@@ -210,6 +210,7 @@ class _CreateAccountSheetState extends ConsumerState<CreateAccountSheet> {
     dob = '$_day-$_month-$_year';
     }
     setState(() => _submitting = true);
+    
 
     
 
@@ -219,7 +220,7 @@ class _CreateAccountSheetState extends ConsumerState<CreateAccountSheet> {
         _passwordController.text,
         _passwordRepeatController.text,
         _fullNameController.text,
-        dob,
+        dob ?? '0-00-0000',
         _role,
         _majorController.text,
         ref,
@@ -236,7 +237,7 @@ Future<void> createAccount(
   String password,
   String passwordRepeated,
   String fullName,
-  String? dateOfBirth,
+  String dateOfBirth,
   String role,
   String major,
   WidgetRef ref,

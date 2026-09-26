@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/features/UserAdditionalDataRequirementPage/presentation/page/page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/page/home_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation/page/login_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/waitingToverifyEmailPage/presentation/page/waiting_to_verfiy_email_page.dart';
@@ -21,12 +22,12 @@ final routerProvider = Provider<GoRouter>((ref){
     refreshListenable:routerNotifier ,
     initialLocation: '/home',
     redirect: (context, state) {
-      //checking auth states , redirectResult used to be the result of chaining of redirects 
+      //checking auth states , redirectResult used to be the result of chaining redirects 
       String? redirectResult = ref.read(routerRedirectLogiqueProvider.notifier).authRedirect(state);
       if (redirectResult != null){
         return redirectResult;
       }
-
+      
       //checking if email verified
       redirectResult = ref.read(routerRedirectLogiqueProvider.notifier).emailVerificationRedirect(state);
       if(redirectResult != null){
@@ -55,6 +56,13 @@ final routerProvider = Provider<GoRouter>((ref){
           return HomePage();
         },
       ),
+      GoRoute(
+        path: '/AdditionalDataSheet',
+        builder: (context, state) {
+          return  UserAdditionalDataRequirementPage();
+        },
+        )
+
     ],
   );
 

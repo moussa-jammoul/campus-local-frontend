@@ -12,9 +12,6 @@ import 'package:logger/logger.dart';
 
 class LoginApiFirebase extends Notifier<void> implements LoginApiDomain {
   
-  final String mainCollectionPointUsers = 'users';
-  final String usersDataAndTokensPoint = 'useritems';
-  final String userDataPoint = 'userdata';
   late Logger logger;
 
   @override
@@ -31,7 +28,11 @@ class LoginApiFirebase extends Notifier<void> implements LoginApiDomain {
       final user = cred.user;
 
       if (user != null && !user.emailVerified) {
+        try{
          await user.sendEmailVerification();
+        } catch(e){
+          logger.e(e);
+        }
       }
       return cred;
 

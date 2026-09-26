@@ -10,7 +10,7 @@ import 'package:logger/logger.dart';
 //A refreshable just to notify the router something change , it may be auth states , or any other listenable
 class RefreshListenAbleRouterNotifier extends ChangeNotifier {
   
-  User? pre;//used to compare between old user and new user to check for changes
+ 
   late Logger logger;
   
   RefreshListenAbleRouterNotifier(Ref ref){
@@ -20,34 +20,31 @@ class RefreshListenAbleRouterNotifier extends ChangeNotifier {
   
   //this function detect whenever a user state change , if it was auth states , email verifaction changes...
   //note that email verification should have a manual button to call firebase auth reload , "so email verification actually change and we get notifie"
-  void _listenToUserState(Ref ref){
+  User? pre;//used to compare between old user and new user to check for changes
+  bool hasRunFirstVerifiedLogin = false;
 
-    FirebaseAuth.instance.userChanges().listen((user)async{
-      logger.i('userChanges fired : email : ${user?.email} , is verified : ${user?.emailVerified}' ,time: DateTime.now());
-      
-     
-      if(user != null){
-        ///this statment here detect that the user logged in
-        if(pre == null){
-           //here we detect that the user just opened the app and he is logged in
-          
-         
-          if(user.emailVerified){
-             ///here we know that the user account is legitamate , we can use inside this
-          ///statment any function we need it to run after succesfly opened the app , or
-          ///signed in and verified his email
-            await handleFirstVerifiedLogin(user , logger);
+void _listenToUserState(Ref ref) {
+  FirebaseAuth.instance.userChanges().listen((user) async {
+    logger.i('userChanges fired : email : ${user?.email} , is verified : ${user?.emailVerified}', time: DateTime.now());
 
-
-          }
-          pre = user;
-        }
-       
-
+    if (user != null) {
+      if (pre == null) {
+        logger.i("pre user is null");
+        pre = user;
       }
-      
-      
-      notifyListeners();
-    });
-  }
+
+      if (user.emailVerified && !hasRunFirstVerifiedLogin) {
+        logger.i("email is verified, running first verified login logic");
+        hasRunFirstVerifiedLogin = true;
+        await handleFirstVerifiedLogin(user, logger, ref);
+      }
+    } else {
+      // user sign out here , we should refresh both so when he sign in again he don't miss those fields from running in the next sign in
+      pre = null;
+      hasRunFirstVerifiedLogin = false;
+    }
+
+    notifyListeners();
+  });
+}
 }

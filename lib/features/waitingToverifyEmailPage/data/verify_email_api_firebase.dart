@@ -28,6 +28,7 @@ class VerifyEmailApiFirebase extends Notifier<void> implements VerifyEmailApiDom
     try{
       ///firebase handle email rate limiter , arround 5 email per 1 hour
     await FirebaseAuth.instance.currentUser?.sendEmailVerification();
+     logger.i("verification email request completed successfully");
     } catch(e){
       logger.e(e);
       rethrow; // needed to handle error in the service side 
