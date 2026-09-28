@@ -15,7 +15,7 @@ final dbProvider = Provider((ref){
 });
 
 
-@DriftDatabase(tables: [AdditionalUserDataDB])
+@DriftDatabase(tables: [AdditionalUserDataDB ,DeviceTokenDB])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 

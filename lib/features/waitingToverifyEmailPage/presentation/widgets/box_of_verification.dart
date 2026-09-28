@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/userAdditionalData/additionalDataFromLogin/addional_data_from_login.dart';
 import 'package:flutterfrontenduniprojectmanager/features/waitingToverifyEmailPage/presentation/errors/providers/reload_user_error.dart';
 import 'package:flutterfrontenduniprojectmanager/features/waitingToverifyEmailPage/presentation/errors/widgets/reload_user_error_widget.dart';
 import 'package:flutterfrontenduniprojectmanager/features/waitingToverifyEmailPage/presentation/errors/widgets/resend_email_verification_error_widget.dart';
@@ -16,6 +17,7 @@ class BoxOfVerification extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final userdata = ref.watch(additionalDataFromLoginProvider);
 
     return Container(
       width: 280,
@@ -74,7 +76,7 @@ class BoxOfVerification extends ConsumerWidget {
 
           // Description
           Text(
-            "We've sent a verification link to your email. Click the link to verify your account.",
+            "We've sent a verification link to your email ${userdata?.email}. Click the link to verify your account.",
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 13.5,
@@ -125,7 +127,7 @@ class BoxOfVerification extends ConsumerWidget {
                 color: colorScheme.onSurfaceVariant,
               ),
               children: [
-                const TextSpan(text: "Didn't receive a verification link? "),
+                const TextSpan(text: "Didn't receive a verification link? (If you haven't received the verification email after clicking the resend link, please check if your email address is spelled correctly.) "),
                 WidgetSpan(
                   alignment: PlaceholderAlignment.middle,
                   child: GestureDetector(

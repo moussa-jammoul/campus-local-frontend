@@ -3,9 +3,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/device_token_provider.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/userAdditionalData/additionalDataFromLogin/addional_data_from_login.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/data/login_api_domain.dart';
-import 'package:flutterfrontenduniprojectmanager/features/loginpage/data/login_form.dart';
+
 import 'package:flutterfrontenduniprojectmanager/main.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
@@ -86,6 +88,26 @@ class LoginApiFirebase extends Notifier<void> implements LoginApiDomain {
       return null;
     }
     
+  }
+
+  @override
+  Future<void> logOut() async {
+    try{
+      ///NOTE : here i implement logique in this data logique to prevent repeating the same invalidate 
+      ///providers each time accros any service side that log out , whenever you want to change the backend provider , please also add a 
+      ///invalidator to the providers , or you need to add in each log out service accros files invalidation logique
+    ref.invalidate(additionalDataFromLoginProvider);
+    ref.invalidate(deviceTokenProvider);
+    
+
+
+    //the actual sing out
+    await FirebaseAuth.instance.signOut();
+
+    }catch(e){
+      logger.e(e);
+      rethrow;
+    }
   }
 
 }

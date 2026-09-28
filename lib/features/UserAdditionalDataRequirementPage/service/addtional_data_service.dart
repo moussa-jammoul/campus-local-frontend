@@ -28,7 +28,7 @@ class AdditionalDataService extends Notifier<void> implements AddtionalDataServi
     await ref.read(cloudAdditionalUserDataDB.notifier).createUserData(dataLocal!);
     ref.read(sheetDataErrorsProvider.notifier).removeError();
     //this variable defined in /router/functions_after_succes... 
-    userDataExistInTheCloud = true;
+    userDataExistInTheCloudAndLocally = true;
     navigatorKey.currentContext?.go('/home');
     }catch(e){
       logger.e(e);

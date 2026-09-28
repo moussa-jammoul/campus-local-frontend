@@ -3,4 +3,5 @@ abstract class VerifyEmailServiceDomain {
   ///email link , so user should manually reload his data to continue
   Future<void> reloadUser();
   Future<void> resendEmail();
+  Future<void> signOut();
 }

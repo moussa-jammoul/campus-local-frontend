@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
+import 'package:flutterfrontenduniprojectmanager/features/loginpage/data/login_api_firebase.dart';
 import 'package:flutterfrontenduniprojectmanager/features/waitingToverifyEmailPage/data/verify_email_api_firebase.dart';
+import 'package:flutterfrontenduniprojectmanager/features/waitingToverifyEmailPage/presentation/errors/providers/failed_sign_out.dart';
 import 'package:flutterfrontenduniprojectmanager/features/waitingToverifyEmailPage/presentation/errors/providers/reload_user_error.dart';
 import 'package:flutterfrontenduniprojectmanager/features/waitingToverifyEmailPage/presentation/errors/providers/resend_email_verification_error.dart';
 import 'package:flutterfrontenduniprojectmanager/features/waitingToverifyEmailPage/presentation/providers/timer_provider_sending_email_verification.dart';
@@ -59,6 +61,18 @@ class VerifyEmailService extends Notifier<void> implements VerifyEmailServiceDom
     }
 
     
+  }
+
+  @override
+  Future<void> signOut() async{
+    try{
+    await ref.read(loginApiProvider.notifier).logOut();
+    ref.read(signOutErrorProvider.notifier).removeError();
+
+    } catch(e){
+      logger.e(e);
+      ref.read(signOutErrorProvider.notifier).showError();
+    }
   }
 
 }
