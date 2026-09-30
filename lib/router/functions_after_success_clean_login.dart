@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/additional_user_data_cloud_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/device_token_cloud_domain.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_device_token.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/all_devices_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/device_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/userAdditionalData/additionalDataFromLogin/addional_data_from_login.dart';
@@ -18,6 +20,14 @@ import 'package:device_info_plus/device_info_plus.dart';
 
 
 
+///to make things simpler to understand for developers , we require to read this message
+///any provider  that live inside /core/database/local/providersAndforms , when we call via this provider
+///.addData , it will write the data in the local db then automaticaly read from that db , no need to call manually .readData (e.g device token provider , user additional data provider)
+///.readData always read from the local db , never from the cloud (local - first app) , so whenever we need to read something from the cloud 
+///we should get manually the data from the cloud , then .addData to the provider
+
+
+
 bool userDataExistInTheCloudAndLocally = false; // bool to check if user data exist in the cloud
 
 Future<void> handleFirstVerifiedLogin(User user ,Logger logger, Ref ref) async {
@@ -26,10 +36,47 @@ Future<void> handleFirstVerifiedLogin(User user ,Logger logger, Ref ref) async {
   ///continue with google (new account) , so we show the sheet to fill the data and pushing them to 
   ///firestore  ,either error occupied while user is creating his account
   await ensureUserDataExists(user, logger, ref);
-  unawaited(ensureDeviceTokenExistsAndListenForFCMChanges(user, logger, ref));
+
+  ///here we check if the current device token exist in the cloud and locally , and we call listen to fcm changes directly after we ensure 
+  ///that the data exist in both cloud and locally so no race between those two logique could happen "they should be async" , same pattern of the previous one
+  ///but fire-and-forget 
+  unawaited(ensureDeviceTokenExistsAndListenTofcmChanges(user, logger, ref));
+  
+
+  ///loading devices linked to the account from the cloud and writing them locally
+  ///this is just at the startup of the app (if network not available it read the local cached data)
+  ///and also in the refresh linked devices  , if nothing found in the local cache that mean we never before called this function
+  ///which require the user manually clicking refresh when network is available
+  final devices = await ref.read(cloudDeviceTokenDataDB.notifier).getAllUserData(FirebaseAuth.instance.currentUser!.uid);
+
+  if (devices != null) {
+    ///same pattern we discused at the top , .add for a provider write stuff locally then automaticaly read from the db
+    ref.read(allDevicesTokenProvider.notifier).addAllDevices(devices);
+  }
+  
+
+
   ///TODO , give the permision to any function that listen to firestore snapshot to start listening (fire and forgte function)
   
    
+}
+
+
+
+///function to listen to fcm token changes , whenever tokens change , we
+///update them locally and in the cloud
+Future<void> listenToFcmTokensChanges(User user, Logger logger, Ref ref) async{
+   FirebaseMessaging.instance.onTokenRefresh.listen((newtoken) async{
+    logger.i("User fcm token changes Fired , updating token locally and in the cloud..");
+    DeviceToken? device = ref.read(deviceTokenProvider); 
+    if(device != null){
+      device = device.copyWith(notificationToken: newtoken);
+      await ref.read(cloudDeviceTokenDataDB.notifier).updateUserData(device);
+      await ref.read(deviceTokenProvider.notifier).updateData(device);
+    } else{
+      logger.e("user token still not initialized");
+    }
+  });
 }
 
 
@@ -37,7 +84,7 @@ Future<void> handleFirstVerifiedLogin(User user ,Logger logger, Ref ref) async {
 ///fcm tokens changes (because fcm token exist in the device token category) , devices tokens are important
 ///to render for the user existing linked devices to the current account , it is simply the indentifier
 ///of a certain device the current account hold
-Future<void> ensureDeviceTokenExistsAndListenForFCMChanges(User user, Logger logger, Ref ref) async {
+Future<void> ensureDeviceTokenExistsAndListenTofcmChanges(User user, Logger logger, Ref ref) async {
   bool deviceTokenExistInTheCloudAndLocally = false;
   int notificationPermissionRetryCount = 0;
   const maxNotificationPermissionRetries = 3;
@@ -88,49 +135,52 @@ Future<void> ensureDeviceTokenExistsAndListenForFCMChanges(User user, Logger log
           await Future.delayed(const Duration(seconds: 10));
         }
       } else {
-        logger.i('device token does not exist locally or in the cloud, requesting permission...');
-      
-        final fcmToken = await requestNotificationPermissionAndGetToken(logger);
+  logger.i('device token does not exist locally or in the cloud, requesting permission...');
 
-        if (fcmToken == null) {
-          if(!Platform.isWindows){
-          notificationPermissionRetryCount++;
-          logger.e('notification permission denied or token unavailable, attempt $notificationPermissionRetryCount of $maxNotificationPermissionRetries');
+  String? fcmToken;
 
-          if (notificationPermissionRetryCount >= maxNotificationPermissionRetries) {
-            logger.e('max notification permission retries reached');
-          }
+  if (Platform.isWindows) {
+    logger.i('Windows does not support FCM, registering device with no notification token');
+    fcmToken = null;
+  } else {
+    fcmToken = await requestNotificationPermissionAndGetToken(logger);
 
-          else{
+    if (fcmToken == null) {
+      notificationPermissionRetryCount++;
+      logger.e('notification permission denied or token unavailable, attempt $notificationPermissionRetryCount of $maxNotificationPermissionRetries');
 
-          await Future.delayed(const Duration(seconds: 10));
-          continue;
-          }
-          }
-        }
-
-        try {
-          final newDeviceToken = DeviceToken(
-            userUid: user.uid,
-            uniqueDeviceAccountId: deviceIdentity.deviceId,
-            notificationToken: fcmToken ?? "null",
-            deviceName: deviceIdentity.deviceName,
-          );
-
-          await ref.read(deviceTokenProvider.notifier).addNewData(newDeviceToken);
-          final deviceToken = ref.read(deviceTokenProvider); //we use here the one from the provider to plug it to firebase
-          //because created_at and updated_at initilaized from the local db , so when we add the data to the local
-          //db , automaticaly the provider read the last new data with created_at and updated_at initialized , then we pass
-          //it to firestore
-          await ref.read(cloudDeviceTokenDataDB.notifier).createUserData(deviceToken!);
-          deviceTokenExistInTheCloudAndLocally = true;
-        } catch (e) {
-          logger.e(e);
-          await Future.delayed(const Duration(seconds: 10));
-        }
+      if (notificationPermissionRetryCount < maxNotificationPermissionRetries) {
+        await Future.delayed(const Duration(seconds: 10));
+        continue;
       }
+
+      logger.e('max notification permission retries reached, registering device with no token');
     }
   }
+
+  try {
+    final newDeviceToken = DeviceToken(
+      userUid: user.uid,
+      uniqueDeviceAccountId: deviceIdentity.deviceId,
+      notificationToken: fcmToken,
+      deviceName: deviceIdentity.deviceName,
+    );
+
+    await ref.read(deviceTokenProvider.notifier).addNewData(newDeviceToken);
+    final deviceToken = ref.read(deviceTokenProvider);
+    await ref.read(cloudDeviceTokenDataDB.notifier).createUserData(deviceToken!);
+    deviceTokenExistInTheCloudAndLocally = true;
+  } catch (e) {
+    logger.e(e);
+    await Future.delayed(const Duration(seconds: 10));
+  }
+}
+    }
+  }
+
+  ///we plug this right here because we need it asynchronized with the previous one , or we have small
+  ///chance it run before we ensure device token exist on both cloud and locally
+  unawaited(listenToFcmTokensChanges(user, logger, ref));
 }
 
 

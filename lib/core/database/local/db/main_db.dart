@@ -2,6 +2,7 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 import 'db_tables.dart';
 
 part 'main_db.g.dart';
@@ -15,7 +16,14 @@ final dbProvider = Provider((ref){
 });
 
 
-@DriftDatabase(tables: [AdditionalUserDataDB ,DeviceTokenDB])
+@DriftDatabase(tables: [
+  AdditionalUserDataDB,
+  DeviceTokenDB,
+  SemesterDB,
+  CourseDB,
+  DeadLineDB,
+  MediaDB,
+],)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 

@@ -90,6 +90,8 @@ class WritingUserData extends Notifier<void> {
   if (db != null) {
     await (db!.delete(db!.additionalUserDataDB)..where((t) => t.uid.equals(uid)))
         .go();
+  } else{
+    throw Error();
   }
   }
 

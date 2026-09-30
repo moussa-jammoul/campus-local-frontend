@@ -22,7 +22,7 @@ class WritingDeviceToken extends Notifier<void> {
       await db!.into(db!.deviceTokenDB).insertOnConflictUpdate(
         DeviceTokenDBCompanion.insert(
           userUid: newData.userUid,
-          notifictionToken: newData.notificationToken,
+          notifictionToken: Value(newData.notificationToken),
           deviceAccountUniqueKey: newData.uniqueDeviceAccountId,
           deviceName: newData.deviceName,
         ),

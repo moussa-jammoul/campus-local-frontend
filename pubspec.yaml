@@ -48,6 +48,8 @@ dependencies:
   drift_flutter: ^0.2.0
   device_info_plus: ^13.2.0
   firebase_messaging: ^16.7.0
+  shared_preferences: ^2.5.5
+  uuid: ^4.6.0
 
 dev_dependencies:
   flutter_test:

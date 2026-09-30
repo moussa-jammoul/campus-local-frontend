@@ -11,6 +11,10 @@ import 'package:logger/web.dart';
 ///his email , after email verification , function that live in /router/functions_after_succes_clean_login.dart
 ///will handle using those data to inject them to firestore (if the data is missed entirely , we ask the user 
 ///to complete the form again), plus ui will read directly from it (local first application :) )
+///
+///
+///Note : for ui , we can read directly from ref.read or ref.watch because at the very first opening of the app
+///the daily check up function after succes clean log in handled the read data function 
 class AddionalDataFromLogin extends Notifier<UserAdditionalData?> {
   late Logger logger;
 

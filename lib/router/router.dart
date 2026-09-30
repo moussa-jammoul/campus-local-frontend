@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/features/UserAdditionalDataRequirementPage/presentation/page/page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/page/home_page.dart';
+import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/page/settings_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation/page/login_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/waitingToverifyEmailPage/presentation/page/waiting_to_verfiy_email_page.dart';
 import 'package:flutterfrontenduniprojectmanager/router/refresh_listen_able.dart';
@@ -55,6 +56,14 @@ final routerProvider = Provider<GoRouter>((ref){
         builder: (context, state) {
           return HomePage();
         },
+        routes: [
+          GoRoute(
+            path: 'settings',
+            builder: (context, state) {
+              return SettingsPage();
+            },
+            )
+        ]
       ),
       GoRoute(
         path: '/AdditionalDataSheet',

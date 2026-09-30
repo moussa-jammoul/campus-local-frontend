@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/all_devices_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/device_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/userAdditionalData/additionalDataFromLogin/addional_data_from_login.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
@@ -98,6 +99,7 @@ class LoginApiFirebase extends Notifier<void> implements LoginApiDomain {
       ///invalidator to the providers , or you need to add in each log out service accros files invalidation logique
     ref.invalidate(additionalDataFromLoginProvider);
     ref.invalidate(deviceTokenProvider);
+    ref.invalidate(allDevicesTokenProvider);
     
 
 

@@ -65,7 +65,7 @@ class _UserAdditionalDataRequirementPageState
   },
       child: Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: false, // no back button
+          automaticallyImplyLeading: false, 
           title: const Text('Complete your profile'),
         ),
         body: SafeArea(

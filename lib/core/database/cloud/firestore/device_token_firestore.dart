@@ -152,8 +152,10 @@ class DeviceTokenFirestore extends Notifier<void> implements DeviceTokenCloudDom
         final rawResult = await docRef.get();
         return rawResult.docs.map((doc){
           final singleDeviceRaw = doc.data();
-
-          return DeviceToken.fromFirestore(singleDeviceRaw, uniqueDeviceAccountId: doc.id);
+          
+          final device =  DeviceToken.fromFirestore(singleDeviceRaw, uniqueDeviceAccountId: doc.id);
+          logger.i(device.toString());
+          return device;
         }).toList();
       } catch(e){
         logger.e(e);
