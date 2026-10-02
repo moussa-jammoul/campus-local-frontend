@@ -21,6 +21,18 @@ class Semester {
     this.updatedAt,
   });
 
+  ///NOTE: this function is used to compare semester , 
+  ///i created it so it is used to prevent echo writes for updating the semester while listening to the cloud
+  ///inside the semester_provider  , u can use it anywhere else if u may need comparing two semesters
+  bool hasSameContentAs(Semester other) {
+    return uuid == other.uuid &&
+        userUid == other.userUid &&
+        semesterName == other.semesterName &&
+        description == other.description &&
+        finishedOrYet == other.finishedOrYet;
+  }
+
+
   Semester copyWith({
   int? id,
   String? uuid,

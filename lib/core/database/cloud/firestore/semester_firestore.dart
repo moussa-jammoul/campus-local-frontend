@@ -5,6 +5,7 @@ import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/seme
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:logger/logger.dart';
+import 'dart:async';
 
 CollectionReference<Map<String, dynamic>> get docRef =>
     FirebaseFirestore.instance
@@ -55,8 +56,14 @@ class SemesterFirestore extends Notifier<void> implements SemesterCloudDomain {
   }
 
   @override
-  Future<void> listenToCloudUpdates() async {
-    // TODO: implement listen to cloud for semester
+  Stream<QuerySnapshot<Map<String, dynamic>>>? listenToCloudUpdates(){
+    if(FirebaseAuth.instance.currentUser != null){
+      logger.i("returning stream for semester cloud db ");
+    return docRef.snapshots();
+    } else{
+      logger.e('user uid still not initialized');
+     return null;
+    }
   }
 
   @override

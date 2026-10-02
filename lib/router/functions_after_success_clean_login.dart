@@ -10,6 +10,7 @@ import 'package:flutterfrontenduniprojectmanager/core/database/local/DataService
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/all_devices_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/device_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/form.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/semester_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/userAdditionalData/additionalDataFromLogin/addional_data_from_login.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/userAdditionalData/additionalDataFromLogin/form.dart';
 import 'package:flutterfrontenduniprojectmanager/router/router.dart';
@@ -47,20 +48,30 @@ Future<void> handleFirstVerifiedLogin(User user ,Logger logger, Ref ref) async {
   ///this is just at the startup of the app (if network not available it read the local cached data)
   ///and also in the refresh linked devices  , if nothing found in the local cache that mean we never before called this function
   ///which require the user manually clicking refresh when network is available
-  final devices = await ref.read(cloudDeviceTokenDataDB.notifier).getAllUserData(FirebaseAuth.instance.currentUser!.uid);
+  unawaited(getAllLinkedDeviceToTheAccount(ref));
+  
+  ///here we start listening to all new and updates  
+
+  unawaited(startListeningToUpdated(user, logger, ref));
+}
+
+Future<void> getAllLinkedDeviceToTheAccount(Ref ref) async{
+   final devices = await ref.read(cloudDeviceTokenDataDB.notifier).getAllUserData(FirebaseAuth.instance.currentUser!.uid);
 
   if (devices != null) {
     ///same pattern we discused at the top , .add for a provider write stuff locally then automaticaly read from the db
     ref.read(allDevicesTokenProvider.notifier).addAllDevices(devices);
   }
-  
 
-
-  ///TODO , give the permision to any function that listen to firestore snapshot to start listening (fire and forgte function)
-  
-   
 }
 
+
+Future<void> startListeningToUpdated(User user, Logger logger, Ref ref) async{
+  logger.i("starting listening to all news and updates...");
+  unawaited(ref.read(semesterProvider.notifier).listenToCloudUpdates());
+
+
+}
 
 
 ///function to listen to fcm token changes , whenever tokens change , we

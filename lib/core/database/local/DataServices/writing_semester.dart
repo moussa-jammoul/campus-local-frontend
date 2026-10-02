@@ -51,6 +51,25 @@ class WritingSemester extends Notifier<void> {
       return null;
     }
   }
+  
+
+  ///used to get a semester by uuid , i personally used only inside preventing echo writes for updating
+  ///u may use it anywhere else
+  Future<Semester?> findByUuid(String uuid) async {
+  if (db == null) return null;
+  final row = await (db!.select(db!.semesterDB)..where((t) => t.uuid.equals(uuid))).getSingleOrNull();
+  if (row == null) return null;
+  return Semester(
+    id: row.id,
+    uuid: row.uuid,
+    userUid: row.userUid,
+    semesterName: row.semesterName,
+    description: row.description,
+    finishedOrYet: row.finishedOrYet,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  );
+}
 
   Future<Semester> writeData(Semester data) async {
   if (db != null) {
@@ -58,6 +77,9 @@ class WritingSemester extends Notifier<void> {
     try {
       final inserted = await db!.into(db!.semesterDB).insertReturning(
             SemesterDBCompanion.insert(
+              uuid:data.uuid != null ? Value(data.uuid!) : const Value.absent(),
+              createdAt: data.createdAt != null ? Value(data.createdAt!) : const Value.absent(),
+              updatedAt: data.updatedAt != null ? Value(data.updatedAt!) : const Value.absent(),
               userUid: data.userUid,
               semesterName: data.semesterName,
               description: data.description,
@@ -89,19 +111,23 @@ class WritingSemester extends Notifier<void> {
     if (db != null) {
       logger.i('updating semester locally: $data');
       try {
-        final inserted = await (db!.update(db!.semesterDB)..where((t) => t.id.equals(data.id!)))
+        final inserted = await (db!.update(db!.semesterDB)..where((t) => t.uuid.equals(data.uuid!)))//we used here uuid because the id is null even if we get the update from firestore , again id is local only
             .writeReturning(
           SemesterDBCompanion(
+            userUid: Value(data.userUid),
+            uuid: Value(data.uuid!),
+            id: data.id == null ? Value.absent() : Value(data.id!) ,
             semesterName: Value(data.semesterName),
             description: Value(data.description),
             finishedOrYet: Value(data.finishedOrYet),
-            updatedAt: Value(DateTime.now()),
+            createdAt: data.createdAt == null ? Value.absent(): Value(data.createdAt!),
+            updatedAt: data.updatedAt == null ?  Value(DateTime.now()) : Value(data.updatedAt!),
           ),
         );
 
         logger.i('updated semester successfully, id: ${data.id}');
         ///NOTE : we are sure that inserted is just a single updated row , because 
-        ///we used the id as comparable , which is unique and primary key for this table
+        ///we used the uuid as comparable , which is unique and primary key for this table
         return Semester(
         id: inserted[0].id,
         uuid: inserted[0].uuid,

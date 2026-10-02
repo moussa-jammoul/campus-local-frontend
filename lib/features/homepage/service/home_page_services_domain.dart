@@ -5,4 +5,5 @@ abstract class HomePageServicesDomain {
   Future<void> createNewSemester(Semester data);
   Future<void> updateSemester(Semester data);
   Future<void> refreshLinkedDevices();
+  
 }

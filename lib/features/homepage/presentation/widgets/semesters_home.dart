@@ -796,9 +796,9 @@ class __EditingSemesterDialogContentState
                                 semesterName: _nameController.text.trim(), 
                                 description: _descriptionController.text.trim(), 
                                 finishedOrYet: _isDone,
-                                id: widget.sem.id //required to compare logique inside the db service
-                                ///no need to implement other details because the db only update those three values
-                                ///Updated at handled automatically inside the local data base to update the value of it
+                                id: widget.sem.id ,
+                                uuid: widget.sem.uuid,
+                                ///no need for other details
                                 );
                               Navigator.of(context).pop(newData);
                             },

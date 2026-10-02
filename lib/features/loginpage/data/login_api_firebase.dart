@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/semester_cloud_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/all_devices_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/device_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/semester_provider.dart';
@@ -102,6 +103,10 @@ class LoginApiFirebase extends Notifier<void> implements LoginApiDomain {
     ref.invalidate(deviceTokenProvider);
     ref.invalidate(allDevicesTokenProvider);
     ref.invalidate(semesterProvider);
+
+    ///invalidating cloud providers because they have a listen functions to listen to
+    ///new db updates after sign in
+    ref.invalidate(semesterCloudProvider);
     
 
 

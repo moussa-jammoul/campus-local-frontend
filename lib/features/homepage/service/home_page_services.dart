@@ -61,7 +61,9 @@ Future<void> refreshLinkedDevices() async {
   @override
   Future<void> updateSemester(Semester rawdata) async {
     try{
+      logger.i(rawdata.toString());
     final data = await ref.read(semesterProvider.notifier).updateData(rawdata);
+    logger.i(data.toString());
 
     ///for the local-first architecture , we don't need to wait firestore function here
     ///because it will keep trying until connection resolve
