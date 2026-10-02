@@ -3,5 +3,6 @@ import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAn
 abstract class HomePageServicesDomain {
   Future<void> logOut();
   Future<void> createNewSemester(Semester data);
+  Future<void> updateSemester(Semester data);
   Future<void> refreshLinkedDevices();
 }

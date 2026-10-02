@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/all_devices_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/device_token_provider.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/semester_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/userAdditionalData/additionalDataFromLogin/addional_data_from_login.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/data/login_api_domain.dart';
@@ -100,6 +101,7 @@ class LoginApiFirebase extends Notifier<void> implements LoginApiDomain {
     ref.invalidate(additionalDataFromLoginProvider);
     ref.invalidate(deviceTokenProvider);
     ref.invalidate(allDevicesTokenProvider);
+    ref.invalidate(semesterProvider);
     
 
 

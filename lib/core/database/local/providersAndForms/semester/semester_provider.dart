@@ -38,11 +38,12 @@ class SemesterProvider extends Notifier<List<Semester>?> {
     }
   }
 
-  Future<void> updateData(Semester data) async {
+  Future<Semester> updateData(Semester data) async {
     logger.i('updating semester: $data');
     try {
-      await ref.read(writeSemesterProvider.notifier).updateData(data);
+      final inserted = await ref.read(writeSemesterProvider.notifier).updateData(data);
       await readData(data.userUid);
+      return inserted;
     } catch (e) {
       logger.e(e);
       rethrow;

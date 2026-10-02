@@ -20,7 +20,7 @@ class HomePageServices extends Notifier<void> implements HomePageServicesDomain 
     logger = ref.read(loggerProvider);
   } 
 
-  //TODO : build update / delete semester
+  //TODO : build delete semester , however ,deleting a semester or a course require more work to delete all nested course and media ,so i should finish first course and media then jump to delete semester
 
   @override
   Future<void> createNewSemester(Semester rawdata) async{
@@ -36,6 +36,8 @@ class HomePageServices extends Notifier<void> implements HomePageServicesDomain 
       logger.e(e);
     }
   }
+
+  
 
   
 
@@ -55,6 +57,24 @@ Future<void> refreshLinkedDevices() async {
   }
   
 }
+
+  @override
+  Future<void> updateSemester(Semester rawdata) async {
+    try{
+    final data = await ref.read(semesterProvider.notifier).updateData(rawdata);
+
+    ///for the local-first architecture , we don't need to wait firestore function here
+    ///because it will keep trying until connection resolve
+    unawaited(
+    ref.read(semesterCloudProvider.notifier).updateSemester(data)
+    );
+    }catch(e){
+      logger.e(e);
+    }
+    
+
+    
+  }
 
 }
 

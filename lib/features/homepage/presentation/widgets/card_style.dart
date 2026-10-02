@@ -43,7 +43,7 @@ class CardStyleWidget extends StatelessWidget {
           ),
         ],
       ),
-      child: child,
+      child:  child,
     );
   }
 }

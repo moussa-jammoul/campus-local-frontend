@@ -85,12 +85,12 @@ class WritingSemester extends Notifier<void> {
   }
 }
 
-  Future<void> updateData(Semester data) async {
+  Future<Semester> updateData(Semester data) async {
     if (db != null) {
       logger.i('updating semester locally: $data');
       try {
-        await (db!.update(db!.semesterDB)..where((t) => t.id.equals(data.id!)))
-            .write(
+        final inserted = await (db!.update(db!.semesterDB)..where((t) => t.id.equals(data.id!)))
+            .writeReturning(
           SemesterDBCompanion(
             semesterName: Value(data.semesterName),
             description: Value(data.description),
@@ -98,7 +98,20 @@ class WritingSemester extends Notifier<void> {
             updatedAt: Value(DateTime.now()),
           ),
         );
+
         logger.i('updated semester successfully, id: ${data.id}');
+        ///NOTE : we are sure that inserted is just a single updated row , because 
+        ///we used the id as comparable , which is unique and primary key for this table
+        return Semester(
+        id: inserted[0].id,
+        uuid: inserted[0].uuid,
+        userUid: inserted[0].userUid,
+        semesterName: inserted[0].semesterName,
+        description: inserted[0].description,
+        finishedOrYet: inserted[0].finishedOrYet,
+        createdAt: inserted[0].createdAt,
+        updatedAt: inserted[0].updatedAt,
+      );
       } catch (e) {
         logger.e(e);
         rethrow;

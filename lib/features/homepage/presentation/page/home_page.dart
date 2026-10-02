@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,10 +16,30 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
+ 
+  ///function used to read stored semester , with 
+  ///retry logique if any thing goes wrong with the user
+  ///e.g uid not initialized yet
+  Future<void> readLocalSemester() async{
+    bool loaded = false;
+    while(!loaded){
+    if(FirebaseAuth.instance.currentUser != null){
+      ref.read(semesterProvider.notifier).readData(FirebaseAuth.instance.currentUser!.uid);
+      loaded = true;
+    } else{
+      //wait 5 second then retry
+      Future.delayed(Duration(seconds: 5));
+    }
+    }
+
+  }
+
   @override
   void initState() {
     super.initState();
-    ref.read(semesterProvider.notifier).readData(FirebaseAuth.instance.currentUser!.uid);
+
+    //init semesters
+    unawaited(readLocalSemester());
   }
   @override
   Widget build(BuildContext context) {

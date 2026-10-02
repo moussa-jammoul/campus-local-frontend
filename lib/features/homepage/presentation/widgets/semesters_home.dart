@@ -2,7 +2,7 @@
 
 import 'dart:async';
 import 'dart:ui';
-
+import 'dart:math' as math;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -288,7 +288,6 @@ Future<void> showCreateSemesterBottomSheet(BuildContext context) async {
             )
           ],
         ),
-        const SizedBox(height: 16),
 
         if (semesters == null)
           const ContainerCard(
@@ -331,11 +330,7 @@ Future<void> showCreateSemesterBottomSheet(BuildContext context) async {
             ),
           )
         else
-          CardStyleWidget(
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-            margin: const EdgeInsets.all(5),
-            kwidth: 400,
-            child: ListView.separated(
+          ListView.separated(
               physics: const NeverScrollableScrollPhysics(),
 
               shrinkWrap: true,
@@ -343,7 +338,7 @@ Future<void> showCreateSemesterBottomSheet(BuildContext context) async {
               separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (_, i) => _SemesterTile(semester: semesters[i]),
             ),
-          )
+          
       ],
     );
   }
@@ -368,13 +363,42 @@ class ContainerCard extends StatelessWidget {
   }
 }
 
-class _SemesterTile extends StatelessWidget {
+class _SemesterTile extends ConsumerWidget {
+
+
+
+  Future<void> showEditingSemesterDialog({
+    required WidgetRef ref,
+  required BuildContext context,
+  required Semester sem,
+}) async {
+  final updatedData = await showDialog<Semester?>(
+    context: context,
+    useSafeArea: false, 
+    barrierColor: Colors.transparent, 
+    builder: (context) {
+      return _EditingSemesterDialogContent(
+        initialName: sem.semesterName,
+        initialDescription: sem.description,
+        initialIsDone: sem.finishedOrYet,
+        sem: sem,
+      );
+    },
+  );
+  if(updatedData != null){
+  await ref.read(homePageServiceProvider.notifier).updateSemester(updatedData);
+  }
+  
+  
+  
+
+}
   const _SemesterTile({required this.semester});
 
   final Semester semester;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context , WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -388,6 +412,14 @@ class _SemesterTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           onTap: () {
             // TODO: Open semester details page
+          },
+          onLongPress: () {
+            unawaited(showEditingSemesterDialog(
+              ref: ref,
+              context: context , 
+              sem: semester
+              ));
+            
           },
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -519,3 +551,274 @@ String _formatDate(DateTime? date) {
 
 
 
+
+
+///those widgets under here are used for editing a semester
+
+class _EditingSemesterDialogContent extends StatefulWidget {
+  const _EditingSemesterDialogContent({
+    required this.sem,
+    required this.initialName,// we prefered to pass those excplicity instead of using the semester because they are describing what they should be used for (e.g initial value which was already the semester information)
+    required this.initialDescription,
+    required this.initialIsDone,
+  });
+
+  final String initialName;
+  final String initialDescription;
+  final bool initialIsDone;
+  final Semester sem;
+
+  @override
+  State<_EditingSemesterDialogContent> createState() =>
+      __EditingSemesterDialogContentState();
+}
+
+class __EditingSemesterDialogContentState
+    extends State<_EditingSemesterDialogContent> {
+  late final TextEditingController _nameController;
+  late final TextEditingController _descriptionController;
+  late bool _isDone;
+
+  @override
+  void initState() {
+    super.initState();
+    // Default values assigned here
+    _nameController = TextEditingController(text: widget.initialName);
+    _descriptionController =
+        TextEditingController(text: widget.initialDescription);
+    _isDone = widget.initialIsDone;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final size = MediaQuery.of(context).size;
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          width: size.width,
+          height: size.height,
+          color: Colors.black.withValues(alpha: 0.35),
+          alignment: Alignment.center,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+               
+                CardStyleWidget(
+                  margin: EdgeInsets.zero,
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.edit_rounded,
+                              size: 18, color: scheme.primary),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Semester Name',
+                            style: textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: scheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _nameController,
+                        style: textTheme.bodyMedium,
+                        decoration: InputDecoration(
+                          hintText: 'e.g. Semester 1',
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                          filled: true,
+                          fillColor:
+                              scheme.surfaceContainerLow.withValues(alpha: 0.6),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+              
+                CardStyleWidget(
+                  margin: EdgeInsets.zero,
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.description_rounded,
+                              size: 18, color: scheme.primary),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Description',
+                            style: textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: scheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _descriptionController,
+                        maxLines: 3,
+                        minLines: 2,
+                        style: textTheme.bodyMedium,
+                        decoration: InputDecoration(
+                          hintText: 'Details...',
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                          filled: true,
+                          fillColor:
+                              scheme.surfaceContainerLow.withValues(alpha: 0.6),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+              
+                CardStyleWidget(
+                  margin: EdgeInsets.zero,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Status',
+                            style: textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: scheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _isDone ? 'Completed' : 'In Progress',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: _isDone
+                                  ? scheme.primary
+                                  : scheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Switch(
+                        value: _isDone,
+                        onChanged: (value) {
+                          setState(() {
+                            _isDone = value;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+               
+                CardStyleWidget(
+                  margin: EdgeInsets.zero,
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      
+                      Expanded(
+                        child: SizedBox(
+                          height: 44,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(null);
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                color: scheme.outline.withValues(alpha: 0.4),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text('Exit'),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 10),
+
+                      // Save Button
+                      Expanded(
+                        child: SizedBox(
+                          height: 44,
+                          child: FilledButton(
+                            onPressed: () {
+                              final newData = Semester(
+                                userUid: widget.sem.userUid, 
+                                semesterName: _nameController.text.trim(), 
+                                description: _descriptionController.text.trim(), 
+                                finishedOrYet: _isDone,
+                                id: widget.sem.id //required to compare logique inside the db service
+                                ///no need to implement other details because the db only update those three values
+                                ///Updated at handled automatically inside the local data base to update the value of it
+                                );
+                              Navigator.of(context).pop(newData);
+                            },
+                            style: FilledButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text('Save'),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
