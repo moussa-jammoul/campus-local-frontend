@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/additional_user_data_cloud_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/device_token_cloud_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_device_token.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/courses_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/all_devices_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/device_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/form.dart';
@@ -69,6 +70,7 @@ Future<void> getAllLinkedDeviceToTheAccount(Ref ref) async{
 Future<void> startListeningToUpdated(User user, Logger logger, Ref ref) async{
   logger.i("starting listening to all news and updates...");
   unawaited(ref.read(semesterProvider.notifier).listenToCloudUpdates());
+  unawaited(ref.read(courseProvider.notifier).listenToCloudUpdates());
 
 
 }

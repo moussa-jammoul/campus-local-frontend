@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/form.dart';
+import 'package:flutterfrontenduniprojectmanager/features/CoursesPage/presentation/page/courses_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/UserAdditionalDataRequirementPage/presentation/page/page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/page/home_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/page/settings_page.dart';
@@ -62,6 +64,13 @@ final routerProvider = Provider<GoRouter>((ref){
             builder: (context, state) {
               return SettingsPage();
             },
+            ),
+            GoRoute(
+              path:'courses',
+              builder : (context , state){
+                final semester = state.extra as Semester;
+                return CoursesPage(semester: semester);
+              }
             )
         ]
       ),

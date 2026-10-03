@@ -10,6 +10,7 @@ import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAn
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/semester_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/card_style.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/service/home_page_services.dart';
+import 'package:go_router/go_router.dart';
 
 class SemestersHome extends ConsumerStatefulWidget {
   const SemestersHome({super.key});
@@ -202,6 +203,9 @@ Future<void> showCreateSemesterBottomSheet(BuildContext context) async {
                                      await createNewSemester(name, description);
                                     } finally {
                                       setModalState(() => _creatingSemester = false);
+                                      if(context.mounted){
+                                        Navigator.of(context).pop();
+                                        }
                                     } 
                                   }
                                 },
@@ -411,7 +415,8 @@ class _SemesterTile extends ConsumerWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () {
-            // TODO: Open semester details page
+            context.go('/home/courses' , extra: semester);
+             
           },
           onLongPress: () {
             unawaited(showEditingSemesterDialog(
