@@ -12,7 +12,18 @@ import 'package:flutterfrontenduniprojectmanager/router/refresh_listen_able.dart
 import 'package:flutterfrontenduniprojectmanager/router/router_redirect_logique.dart';
 import 'package:go_router/go_router.dart';
 
-
+String? getCurrentLocation({Ref? ref, WidgetRef? widgetRef}) {
+  ///we passed here both because we may need it inside a notifier , or a ui
+  if (ref != null) {
+    final router = ref.read(routerProvider);
+    return router.routerDelegate.currentConfiguration.uri.toString();
+  } else if (widgetRef != null) {
+    final router = widgetRef.read(routerProvider);
+    return router.routerDelegate.currentConfiguration.uri.toString();
+  } else {
+    return null;
+  }
+}
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -23,6 +34,7 @@ final routerProvider = Provider<GoRouter>((ref){
  return GoRouter(
     navigatorKey: navigatorKey,
     refreshListenable:routerNotifier ,
+    
     initialLocation: '/home',
     redirect: (context, state) {
       //checking auth states , redirectResult used to be the result of chaining redirects 
@@ -70,7 +82,11 @@ final routerProvider = Provider<GoRouter>((ref){
               builder : (context , state){
                 final semester = state.extra as Semester;
                 return CoursesPage(semester: semester);
-              }
+              },
+              routes: [
+                ///TODO , adding three routes , :courseuuid/images , .../videos , .../files
+
+              ]
             )
         ]
       ),
