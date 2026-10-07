@@ -98,7 +98,7 @@ class MediaForm {
       userUid: data['user_uid'] as String,
       courseUuid: data['course_uuid'] as String,
       filename: data['filename'] as String,
-      fileDescription: data['file_description'] as String,
+      fileDescription: data['file_description'] as String?,
       filepath: data['filepath'] as String,
       filetype: data['filetype'] as String,
       filesizeByte: data['filesize_byte'] as int,

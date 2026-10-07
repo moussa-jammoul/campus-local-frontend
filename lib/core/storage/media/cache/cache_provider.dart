@@ -158,6 +158,7 @@ class CacheManagment{
 
   ///called by cacheThumbnail itself, the ui doesn't need to call it
   void _markThumbnailVisible(String mediaUuid) {
+    
     currentInvisibleImageIdThumbnailCachedUuid.remove(mediaUuid);
   }
 

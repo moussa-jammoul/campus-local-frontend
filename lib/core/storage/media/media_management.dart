@@ -123,7 +123,8 @@ class MediaManagment extends Notifier<void> {
     
 
     ///we don't want to wait thumbnail creation , or it will took long
-    ///to return savedInfo
+    ///to return savedInfo , the trade - off that the user will not see at first
+    ///thumbnail for the video , until next request where the thumbnail is done
     
     unawaited(_createVideoThumbnail(savedInfo.relativePath , mediaUuid));
 

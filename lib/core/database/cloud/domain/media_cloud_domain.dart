@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/cloud/firestore/media_firestore.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 
 /// To understand why we use this model for reading media from the cloud,
@@ -55,3 +57,8 @@ abstract class MediaCloudDomain {
 
 
 }
+
+
+final mediaCloudProvider = NotifierProvider<MediaFirestore,void>((){
+  return MediaFirestore();
+});

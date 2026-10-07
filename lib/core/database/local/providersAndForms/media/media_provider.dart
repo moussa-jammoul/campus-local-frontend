@@ -67,9 +67,11 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
     state = null;
     alreadyRead = 0;
   }
+  
 
-  Future<void> addNewMedia(String userUid, String courseUuid, MediaForm media) async {
-    logger.i('adding new media for the course : $courseUuid');
+  ///used for adding a single media
+  Future<void> addNewMedia( MediaForm media) async {
+    logger.i('adding new media for the course : ${media.courseUuid}');
     try {
       final inserted = await ref.read(writeMediaProvider.notifier).addData(media);
 
@@ -77,7 +79,8 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
       ///because we are here after an asyn , so we can make a quick check by using the current position
       ///of the user
       ///
-      if (getCurrentLocation(ref: ref)?.startsWith('/home/courses/$courseUuid') ?? false) {
+      if (getCurrentLocation(ref: ref)?.startsWith('/home/courses/${media.courseUuid}') ?? false) {
+        
         if (state == null) {
           state = [inserted];
         } else {
@@ -90,4 +93,42 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
       rethrow;
     }
   }
+  
+  ///for performence and optimization , we split one for adding a list of media , whenever it was called from fetching cloud
+  ///media or a future feature to add  multiple media with the same picker , to prevent rebuilding state 
+  ///each time  , e.g let's say we fetch 200 media , looping and calling add new media will overload the cpu
+  ///because rebuilding the state list each time until we end (because state is immutable) , here we just call directly 
+  ///state = [...state , ...list] , one rebuild , note that add list media don't touch state , so to update the state
+  ///we should call reset media state first , then loading paginated data
+  Future<void> addListOfMedia(List<MediaForm> data) async{
+    logger.i('adding list of media for the course');
+    try{
+      List<MediaForm> insertedData = [];
+      for(final media in data ){
+        final existing = media.uuid == null
+            ? null
+            : await ref.read(writeMediaProvider.notifier).findByUuid(media.uuid!);
+
+        if (existing != null) {
+          ///already exist locally, so it is an update (not added to insertedData)
+          await updateMedia(media);
+        } else {
+          final inserted = await ref.read(writeMediaProvider.notifier).addData(media);
+          insertedData.add(inserted);
+        }
+      }
+    
+      logger.i('added list of media successfully');
+
+
+    } catch(e){
+      logger.e(e);
+      rethrow;
+    }
+  }
 }
+
+
+final mediaProvider = NotifierProvider<MediaProvider,List<MediaForm>?>((){
+  return MediaProvider();
+});
