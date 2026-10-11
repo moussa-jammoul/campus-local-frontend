@@ -42,10 +42,10 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
     }
   }
 
-  Future<void> loadPaginatedMediaForACourse(String userUid, String courseUuid, int limit) async {
+  Future<void> loadPaginatedMediaForACourse(String userUid, String courseUuid, int limit , List<String>? fileextention) async {
     logger.i('loading paginated media for courseUuid: $courseUuid, alreadyRead: $alreadyRead, limit: $limit');
     try {
-      final data = await ref.read(writeMediaProvider.notifier).readData(userUid, courseUuid, limit, alreadyRead);
+      final data = await ref.read(writeMediaProvider.notifier).readData(userUid, courseUuid, limit, alreadyRead , fileextention);
       if (data != null && state != null) {
         state = [...state!, ...data];
       } else {
@@ -70,7 +70,7 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
   
 
   ///used for adding a single media
-  Future<void> addNewMedia( MediaForm media) async {
+  Future<MediaForm> addNewMedia( MediaForm media) async {
     logger.i('adding new media for the course : ${media.courseUuid}');
     try {
       final inserted = await ref.read(writeMediaProvider.notifier).addData(media);
@@ -78,8 +78,11 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
       ///here , we can't assume that the user still in the page to actually render the new media
       ///because we are here after an asyn , so we can make a quick check by using the current position
       ///of the user
-      ///
-      if (getCurrentLocation(ref: ref)?.startsWith('/home/courses/${media.courseUuid}') ?? false) {
+      
+      logger.i("checking if user still at the target page");
+      logger.i(getCurrentLocation(ref: ref));
+      if (getCurrentLocation(ref: ref)?.startsWith('/home/courses/${media.courseUuid}') ?? false ) {
+        logger.i("user still inside the page to add the image in the state");
         
         if (state == null) {
           state = [inserted];
@@ -87,7 +90,9 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
           state = [inserted, ...state!];
         }
       }
+      
       logger.i('added media successfully, uuid: ${inserted.uuid}');
+        return inserted;
     } catch (e) {
       logger.e(e);
       rethrow;

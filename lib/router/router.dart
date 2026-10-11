@@ -1,8 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_courses.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/CoursesPage/presentation/page/courses_page.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/detailed_image.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/image_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/UserAdditionalDataRequirementPage/presentation/page/page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/page/home_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/page/settings_page.dart';
@@ -10,19 +14,19 @@ import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation
 import 'package:flutterfrontenduniprojectmanager/features/waitingToverifyEmailPage/presentation/page/waiting_to_verfiy_email_page.dart';
 import 'package:flutterfrontenduniprojectmanager/router/refresh_listen_able.dart';
 import 'package:flutterfrontenduniprojectmanager/router/router_redirect_logique.dart';
+import 'package:flutterfrontenduniprojectmanager/router/routes_data.dart';
 import 'package:go_router/go_router.dart';
 
 String? getCurrentLocation({Ref? ref, WidgetRef? widgetRef}) {
-  ///we passed here both because we may need it inside a notifier , or a ui
-  if (ref != null) {
-    final router = ref.read(routerProvider);
-    return router.routerDelegate.currentConfiguration.uri.toString();
-  } else if (widgetRef != null) {
-    final router = widgetRef.read(routerProvider);
-    return router.routerDelegate.currentConfiguration.uri.toString();
-  } else {
-    return null;
-  }
+  final router = ref != null
+      ? ref.read(routerProvider)
+      : widgetRef?.read(routerProvider);
+  if (router == null) return null;
+
+  final config = router.routerDelegate.currentConfiguration;
+  final lastMatch = config.last;
+  final matchList = lastMatch is ImperativeRouteMatch ? lastMatch.matches : config;
+  return matchList.uri.toString();
 }
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -84,7 +88,23 @@ final routerProvider = Provider<GoRouter>((ref){
                 return CoursesPage(semester: semester);
               },
               routes: [
-                ///TODO , adding three routes , :courseuuid/images , .../videos , .../files
+                GoRoute(
+                  path: ':courseuuid/images',
+                  builder: (context, state) {
+                    final course = state.extra as Course;
+                    return ImagePage(courseData: course,);
+                  },
+                  routes: [
+                    GoRoute(
+                      path: 'image/:uuid',
+                      builder: (context, state) {
+                        final data = state.extra as ImageRouteData;
+                        return DetailedImage(binary: data.bytes, imageDetail: data.imageDetail);
+                      },
+
+                    )
+                  ]
+                )
 
               ]
             )

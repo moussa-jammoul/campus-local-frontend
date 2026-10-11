@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/db/db_tables.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/db/main_db.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
@@ -28,19 +29,36 @@ class WritingMedia extends Notifier<void> {
     String courseUuid,
     int limit,
     int alreadyRead,
+    List<String>? fileextention
   ) async {
     if (db != null) {
       logger.i(
         'reading media locally for userUid: $userUid, courseUuid: $courseUuid, limit: $limit, offset: $alreadyRead',
       );
       try {
-        final rawRows = await (db!.select(db!.mediaDB)
-              ..where((t) => t.userUid.equals(userUid) & t.courseUuid.equals(courseUuid))
+        late List<MediaDBData> rawRows;
+        if(fileextention != null){
+          //get specific type of data = to file extention
+         rawRows = await (db!.select(db!.mediaDB)
+              ..where((t) =>
+    t.userUid.equals(userUid) &
+    t.courseUuid.equals(courseUuid) &
+    t.fileType.isIn(fileextention))
               ..orderBy([
                 (t) => OrderingTerm.desc(t.createdAt),
               ])
               ..limit(limit, offset: alreadyRead))
             .get();
+        } else{
+          ///get all data if no file extention refered
+          rawRows =  await (db!.select(db!.mediaDB)
+              ..where((t) => t.userUid.equals(userUid) & t.courseUuid.equals(courseUuid) )
+              ..orderBy([
+                (t) => OrderingTerm.desc(t.createdAt),
+              ])
+              ..limit(limit, offset: alreadyRead))
+            .get();
+        }
 
         final media = rawRows.map((rawRow) {
           final item = MediaForm(

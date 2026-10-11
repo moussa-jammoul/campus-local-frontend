@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/form.dart';
+import 'package:go_router/go_router.dart';
 
 class ImageVideosFileSheet extends ConsumerWidget {
   const ImageVideosFileSheet({super.key , required this.courseDetail});
@@ -61,7 +62,8 @@ class ImageVideosFileSheet extends ConsumerWidget {
                 icon: Icons.image_rounded,
                 label: 'Images',
                 onTap: () {
-                  ///TODO : open images page
+                  context.push('/home/courses/${courseDetail.uuid}/images' , extra: courseDetail);
+                  Navigator.of(context).pop();
                 },
               ),
               const SizedBox(height: 10),

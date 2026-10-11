@@ -14,6 +14,7 @@ import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAn
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/semester_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/userAdditionalData/additionalDataFromLogin/addional_data_from_login.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/userAdditionalData/additionalDataFromLogin/form.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services.dart';
 import 'package:flutterfrontenduniprojectmanager/router/router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -71,6 +72,10 @@ Future<void> startListeningToUpdated(User user, Logger logger, Ref ref) async{
   logger.i("starting listening to all news and updates...");
   unawaited(ref.read(semesterProvider.notifier).listenToCloudUpdates());
   unawaited(ref.read(courseProvider.notifier).listenToCloudUpdates());
+
+  ///fetch cloud data for all media , it is not a listener , but a single fetch , for more details
+  ///go to core/database/cloud/domain/media_cloud_domain.dart
+  unawaited(ref.read(mediaServiceProvider.notifier).fetchCloudData(null, null));
 
 
 }
