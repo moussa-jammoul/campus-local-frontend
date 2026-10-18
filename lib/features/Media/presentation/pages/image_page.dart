@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/media_provider.dart';
-import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/appbar.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/imageAppbar.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/ImageService/media_image_service.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services.dart';
 import 'package:flutterfrontenduniprojectmanager/router/routes_data.dart';
@@ -38,7 +38,7 @@ class _ImagePageState extends ConsumerState<ImagePage> {
 
   @override
   void dispose() {
-    _scrollController.dispose();   // disposing it also drops the listener
+    _scrollController.dispose(); 
     super.dispose();
   }
 
@@ -147,7 +147,7 @@ class _ImageGridBody extends ConsumerWidget {
           maxCrossAxisExtent: 140,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          childAspectRatio: 1, // Keeps tiles square
+          childAspectRatio: 1, 
         ),
         itemCount: mediaList.length,
         

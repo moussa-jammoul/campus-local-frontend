@@ -9,10 +9,12 @@ abstract class MediaServicesDomain {
   ///of fetching data will use (e.g no data exist locally at all , or getting new updates)
   ///also use it for the refresh button inside the media ui
   Future<void> fetchCloudData(String? courseUuid , List<String>? fileextention);
-
+  
+  Future<(String? sourcePath , String? type)?> pickVideo(List<String> type);
 
   Future<(String? sourcePath , Uint8List? binary, String? type)?> pickImage(List<String> type);
-
+  
+  Future<(String? sourcePath , String? type)?> pickFile(List<String> type);
   ///only for local refresh , it read again paginated data of the very first 
   ///rows , no seperate button for it , only fetchcloud data call it 
   Future<void> refreshDataLocally(String? courseUuid , List<String>? fileextention);

@@ -102,6 +102,19 @@ class MediaManagment extends Notifier<void> {
     }
   }
   
+  ///we use this to grab the video path so the video player use it to render the video
+  Future<String?> grabFilePath({required String relativePath}) async{
+    final appDocDir = await getApplicationDocumentsDirectory();
+    final f = File(p.join(appDocDir.path, relativePath));
+    if(!await f.exists()){
+      return null;
+    } else{
+      return f.path;
+    }
+
+
+  }
+  
 
   ///---------------video--------------------
   
@@ -133,6 +146,21 @@ class MediaManagment extends Notifier<void> {
       logger.e('Failed to save video file $mediaUuid', error: e, stackTrace: st);
       rethrow;
     }
+
+  }
+  
+
+  ///we use this to grab the video path so the video player use it to render the video
+  ///same method as the grab file path , splitting them for clean and readable code
+  Future<String?> grabVideoPath({required String relativePath}) async{
+    final appDocDir = await getApplicationDocumentsDirectory();
+    final f = File(p.join(appDocDir.path, relativePath));
+    if(!await f.exists()){
+      return null;
+    } else{
+      return f.path;
+    }
+
 
   }
 

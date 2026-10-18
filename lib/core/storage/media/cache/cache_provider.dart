@@ -33,9 +33,9 @@ class CacheManagment{
   List<String> currentInvisibleImageIdThumbnailCachedUuid = [];
 
 
-  final int maxCacheImages = 60;
+  final int maxCacheImages = 25;
   
-  final int maxCacheThumbnails = 45;
+  final int maxCacheThumbnails = 25;
 
   late Logger logger;
   

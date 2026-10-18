@@ -55,6 +55,8 @@ dependencies:
   video_thumbnail: ^0.5.6
   collection: ^1.19.1
   file_picker: ^13.1.0
+  video_player: ^2.14.1
+  open_filex: ^5.0.0
 
 dev_dependencies:
   flutter_test:

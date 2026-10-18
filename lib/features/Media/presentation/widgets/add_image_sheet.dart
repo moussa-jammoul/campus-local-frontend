@@ -16,9 +16,6 @@ class AddImageBottomSheetContent extends ConsumerStatefulWidget {
     return _AddImageBottomSheetContentState();
   }
 
- 
-
-  
 }
 
 class _AddImageBottomSheetContentState

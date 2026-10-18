@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/semester_cloud_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/all_devices_token_provider.dart';
@@ -67,6 +68,12 @@ class LoginApiFirebase extends Notifier<void> implements LoginApiDomain {
   @override
   Future<UserCredential?> signInWithGoogle() async {
     try{
+       if (kIsWeb) {
+      final provider = GoogleAuthProvider()
+        ..addScope('email')
+        ..addScope('profile');
+      return await FirebaseAuth.instance.signInWithPopup(provider);
+    }
     final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
 
     

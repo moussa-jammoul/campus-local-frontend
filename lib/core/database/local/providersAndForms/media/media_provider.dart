@@ -35,6 +35,12 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
     logger.i('updating media: $data');
     try {
       await ref.read(writeMediaProvider.notifier).updateData(data);
+       final current = state;
+       if (current != null) {
+      state = [
+        for (final m in current) m.uuid == data.uuid ? data : m,
+      ];
+      }
       logger.i('updated media successfully, uuid: ${data.uuid}');
     } catch (e) {
       logger.e(e);

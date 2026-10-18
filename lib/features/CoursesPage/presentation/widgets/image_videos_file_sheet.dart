@@ -62,8 +62,9 @@ class ImageVideosFileSheet extends ConsumerWidget {
                 icon: Icons.image_rounded,
                 label: 'Images',
                 onTap: () {
-                  context.push('/home/courses/${courseDetail.uuid}/images' , extra: courseDetail);
                   Navigator.of(context).pop();
+                  context.push('/home/courses/${courseDetail.uuid}/images' , extra: courseDetail);
+                  
                 },
               ),
               const SizedBox(height: 10),
@@ -71,9 +72,9 @@ class ImageVideosFileSheet extends ConsumerWidget {
                 icon: Icons.videocam_rounded,
                 label: 'Videos',
                 onTap: () {
-
-                  ///TODO : open videos page
-
+                   Navigator.of(context).pop();
+                  context.push('/home/courses/${courseDetail.uuid}/videos' , extra: courseDetail);
+                 
                 },
               ),
               const SizedBox(height: 10),
@@ -81,7 +82,9 @@ class ImageVideosFileSheet extends ConsumerWidget {
                 icon: Icons.insert_drive_file_rounded,
                 label: 'Files',
                 onTap: () {
-                  ///TODO : open files page
+                  Navigator.of(context).pop();
+                  context.push('/home/courses/${courseDetail.uuid}/files' , extra: courseDetail);
+                 
                 },
               ),
             ],

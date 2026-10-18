@@ -6,7 +6,10 @@ import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAn
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/CoursesPage/presentation/page/courses_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/detailed_image.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/file_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/image_page.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/video_page.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/video_player_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/UserAdditionalDataRequirementPage/presentation/page/page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/page/home_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/page/settings_page.dart';
@@ -102,6 +105,30 @@ final routerProvider = Provider<GoRouter>((ref){
                         return DetailedImage(binary: data.bytes, imageDetail: data.imageDetail);
                       },
 
+                    )
+                  ]
+                ),
+                GoRoute(
+                  path: ':courseuuid/files',
+                  builder: (context, state) {
+                    final course = state.extra as Course;
+                    return FilePage(courseData: course);
+                  },
+                ),
+                GoRoute(
+                  path: ':courseuuid/videos',
+                  builder: (context , state){
+                    final course = state.extra as Course;
+                    return VideoPage(courseData: course);
+                  },
+                  routes: [
+                    GoRoute(
+                      path: 'video/:uuid',
+                      builder: (context, state) {
+                        final data = state.extra as VideoRouteData;
+                        return VideoPlayerPage(videoPath: data.explicitPath, videoDetail: data.videoDetails);
+                        
+                      },
                     )
                   ]
                 )

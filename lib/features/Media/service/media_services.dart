@@ -98,7 +98,37 @@ class MediaServices extends Notifier<void> implements MediaServicesDomain {
       return null;
     }
     final sourcePath  = result.path;
-    return (sourcePath , await result.readAsBytes() , result.extension);
+    return (sourcePath , await result.readAsBytes() , result.extension?.toLowerCase());
+  }
+  
+
+
+  ///note about video types , if a video file type is not supported via the
+  ///video player we will use in the app , we will hand the source path to the os app picker 
+  ///so the user choose a certain app to open the video with 
+  @override
+  Future<(String? sourcePath , String? type)?> pickVideo(List<String> type) async {
+    final result = await FilePicker.pickFile(
+    type: FileType.custom,
+    allowedExtensions: type,
+  );
+
+  if (result == null) return null;   
+  return (result.path, result.extension?.toLowerCase());
+    
+  }
+  
+
+  ///similar to video , but we prefere to split them for readable code and understandable one
+  @override
+  Future<(String? sourcePath, String? type)?> pickFile(List<String> type) async {
+    final result = await FilePicker.pickFile(
+      type: FileType.custom,
+      allowedExtensions: type,
+    );
+    if(result == null) return null;
+    return (result.path , result.extension?.toLowerCase());
+  
   }
 }
 

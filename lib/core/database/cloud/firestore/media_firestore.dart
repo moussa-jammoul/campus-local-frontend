@@ -74,12 +74,12 @@ class  MediaFirestore extends Notifier<void> implements MediaCloudDomain {
 
   @override
   Future<void> addNewMedia(MediaForm data) async {
-    logger.i('adding new semester to firestore: $data');
+    logger.i('adding new media to firestore: $data');
 
     if (FirebaseAuth.instance.currentUser != null) {
       try {
         await docRef.doc(data.uuid).set(data.toFirestore());
-        logger.i('added semester to firestore successfully, uuid: ${data.uuid}');
+        logger.i('added media to firestore successfully, uuid: ${data.uuid}');
       } catch (e) {
         logger.e(e);
         rethrow;
@@ -144,12 +144,12 @@ class  MediaFirestore extends Notifier<void> implements MediaCloudDomain {
 
   @override
   Future<void> updateMedia(MediaForm data) async {
-    logger.i('updating semester in firestore: $data');
+    logger.i('updating media in firestore: $data');
 
     if (FirebaseAuth.instance.currentUser != null) {
       try {
         await docRef.doc(data.uuid).update(data.toFirestore());
-        logger.i('updated semester in firestore successfully, uuid: ${data.uuid}');
+        logger.i('updated media in firestore successfully, uuid: ${data.uuid}');
       } catch (e) {
         logger.e(e);
         rethrow;

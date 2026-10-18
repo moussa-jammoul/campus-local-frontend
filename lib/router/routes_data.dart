@@ -11,3 +11,13 @@ class ImageRouteData {
     required this.imageDetail
   });
 }
+
+class VideoRouteData {
+  final String? explicitPath;
+  final MediaForm videoDetails;
+  const VideoRouteData({
+    required this.explicitPath,
+    required this.videoDetails
+  });
+
+}

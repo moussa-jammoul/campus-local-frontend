@@ -38,5 +38,7 @@ class AppDatabase extends _$AppDatabase {
 }
 
 QueryExecutor _openConnection(){
-  return driftDatabase(name: 'app_local_db');
+  return driftDatabase(
+    name: 'app_local_db',
+    );
 }
