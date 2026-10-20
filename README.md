@@ -1,10 +1,10 @@
 # Campus Local
 
-A new Flutter project — the frontend for the "Campus Local" project, built for Lebanese university students. Free and open-source, with a fast and interactive UI. A local-first application to manage students' semesters, courses, media (videos, images, files), deadlines, and calendars, synced with the Firestore cloud service.
+A new project ,"Campus Local", built for Lebanese university students. Free and open-source, with a fast and interactive UI. A local-first application to manage students' semesters, courses, media (videos, images, files), deadlines, and calendars, synced with the Firestore cloud service.
 
 ## Quick Notes
 
-The project architecture is local-first: the app is designed to manage a student's university life fully offline (aside from logging in), with the local database as the source of truth. The parts we sync to the external cloud are: deadlines, user data, courses, semesters, and media metadata (not the media itself).
+The project architecture is local-first: the app is designed to manage a student's university life fully offline (aside from logging in), with the local database as the source of truth. The parts we sync to the external cloud are: deadlines, user data (and device tokens), courses, semesters, and media metadata (not the media itself).
 
 ### Sync strategy
 
@@ -16,7 +16,7 @@ Note: the project is flexible enough to swap Firestore for a different cloud dat
 
 ### Media handling
 
-On the media side, we only store the logical path (e.g. `/semester1/m1101/{media_id}`) of a given media file in the DB , the actual file lives in a local folder external to the app's sandboxed storage, on the device itself. **There is no real media file syncing to the server DB** , media metadata syncs like any other table, but the file bytes never touch the server.
+On the media side, we only store the logical path (e.g. `/semester1/m1101/{media_id}`) of a given media file in the DB , the actual file lives in the local sandboxed storage of the application. **There is no real media file syncing to the server DB** , media metadata syncs like any other table, but the file bytes never touch the server.
 
 For multi-device support, the app relies on direct device-to-device transfer over the same LAN/WiFi network: the device holding the file starts a local HTTPS server (self-signed certificate) and advertises itself via mDNS (multicast DNS); the device missing the file discovers it, pairs using a one-time-session PIN, and requests the missing files individually over HTTPS. Never rely on the application as "cloud storage" , it is local-first and device-synced only.
 
@@ -29,5 +29,21 @@ For multi-device support, the app relies on direct device-to-device transfer ove
 2. Run `flutter pub get`.
 3. Set up your own Firebase project, and add your config files and Firestore security rules.
 4. Run the app , platform plugin files will be generated automatically on first run.
+
+### Known build issue: `video_thumbnail` (Android)
+
+The project uses the `video_thumbnail` package, which is no longer maintained. Its Android build files use outdated settings, so the first `flutter run` may fail with errors like `Could not find method jcenter()` or `:video_thumbnail:checkDebugAarMetadata`.
+
+To fix it, open the package's Gradle file in your pub cache (on Windows: `%LOCALAPPDATA%\Pub\Cache\hosted\pub.dev\video_thumbnail-0.5.6\android\build.gradle`) and make two changes:
+
+1. Replace both `jcenter()` entries with `mavenCentral()`.
+2. Raise `compileSdkVersion` to match your Flutter project (for example `36`).
+
+Then run `flutter clean` and `flutter run` again.
+
+> These edits live in your local pub cache, so they are lost if the cache is repaired or the package is redownloaded. A permanent fix (replacing the package with a maintained alternative) is planned.
+
+
+### System designs and choices
 
 > To understand the full sync and media-transfer design (diagrams, edge cases, and reasoning), and the database tables, developers can download **uniProjectDB.drawio** (not ready yet) from the repo and open it via draw.io.
