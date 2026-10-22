@@ -82,9 +82,14 @@ class CourseProvider extends Notifier<List<Course>?> {
             } else {
               await updateData(incoming);
             }
-
-          case DocumentChangeType.removed:
-            // TODO: handle delete logic when delete logic exists
+          
+          ///trade off of this model that a user can delete from a phone a semester , while he is in another phone inside
+          ///the semester itself , he can create a course to a ghost semester that doesn't exist anymore
+          case DocumentChangeType.removed:{
+           final course = Course.fromFirestore(change.doc.data()!, change.doc.id);
+          await deleteDataByUuid(course.uuid!, course.userUid, course.semesterUuid);
+          }
+            
         }
       }
     });
@@ -127,6 +132,17 @@ class CourseProvider extends Notifier<List<Course>?> {
       final inserted = await ref.read(writeCourseProvider.notifier).updateData(data);
       await readData(data.userUid, data.semesterUuid);
       return inserted;
+    } catch (e) {
+      logger.e(e);
+      rethrow;
+    }
+  }
+  
+  Future<void> deleteDataByUuid(String uuid , String userUid , String semesterUuid) async{
+    logger.i('deleting course, uuid : $uuid, userUid: $userUid');
+    try {
+      await ref.read(writeCourseProvider.notifier).deleteDataByUuid(uuid);
+      await readData(userUid, semesterUuid);
     } catch (e) {
       logger.e(e);
       rethrow;

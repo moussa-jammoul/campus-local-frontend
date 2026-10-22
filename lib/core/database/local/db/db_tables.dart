@@ -73,7 +73,7 @@ class DeviceTokenDB extends Table {
 
 class SemesterDB extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get uuid => text().clientDefault(() => const Uuid().v7())();
+  TextColumn get uuid => text().clientDefault(() => const Uuid().v7()).unique()();
 
   TextColumn get userUid => text()();
   TextColumn get semesterName => text()();
@@ -88,7 +88,7 @@ class SemesterDB extends Table {
 @TableIndex(name: 'idx_course_semester_uuid', columns: {#semesterUuid})
 class CourseDB extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get uuid => text().clientDefault(() => const Uuid().v7())();
+  TextColumn get uuid => text().clientDefault(() => const Uuid().v7()).unique()();
 
   TextColumn get userUid => text()();
   TextColumn get semesterUuid => text()();
@@ -104,7 +104,7 @@ class CourseDB extends Table {
 @TableIndex(name: 'idx_deadline_media_uuid', columns: {#mediaUuid})
 class DeadLineDB extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get uuid => text().clientDefault(() => const Uuid().v7())();
+  TextColumn get uuid => text().clientDefault(() => const Uuid().v7()).unique()();
 
   TextColumn get userUid => text()();
   TextColumn get mediaUuid => text().nullable()();
@@ -112,13 +112,15 @@ class DeadLineDB extends Table {
   TextColumn get title => text()();
   TextColumn get description => text()();
   BoolColumn get notified => boolean()();
+  DateTimeColumn get createdAt => dateTime().clientDefault(() => DateTime.now())();
+  DateTimeColumn get updatedAt => dateTime().clientDefault(() => DateTime.now())();
 }
 
 // Media table
 @TableIndex(name: 'idx_media_course_uuid', columns: {#courseUuid})
 class MediaDB extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get uuid => text().clientDefault(() => const Uuid().v7())();
+  TextColumn get uuid => text().clientDefault(() => const Uuid().v7()).unique()();
 
   TextColumn get userUid => text()();
   TextColumn get courseUuid => text()();

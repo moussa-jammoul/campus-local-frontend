@@ -41,7 +41,7 @@ class VideoPlayerPage extends ConsumerWidget {
                       .read(mediaProvider)
                       ?.firstWhereOrNull((m) => m.uuid == videoDetail.uuid) ??
                   videoDetail;
-              MediaDetailSheet.show(context, live);
+              MediaDetailSheet.show(context: context, media: live , thumbnail: videoPath);
             },
             icon: const Icon(Icons.menu),
           ),

@@ -19,9 +19,7 @@ abstract class MediaImageServiceDomain {
 
   Future<void> updateMedia(MediaForm data);
   
-  ///only deleting things locally , for more information , go to media cloud domain
-  ///inside core/database/cloud/domain
-  Future<void> deleteMedia(int id);
+  
   
 
   ///it will handle the ui request that they are outside the render box for caching images

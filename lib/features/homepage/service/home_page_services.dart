@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/courses_cloud_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/device_token_cloud_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/semester_cloud_domain.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_courses.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_device_token.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/all_devices_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/form.dart';
@@ -20,8 +22,7 @@ class HomePageServices extends Notifier<void> implements HomePageServicesDomain 
     logger = ref.read(loggerProvider);
   } 
 
-  //TODO : build delete semester , however ,deleting a semester or a course require more work to delete all nested course and media ,so i should finish first course and media then jump to delete semester
-
+ 
   @override
   Future<void> createNewSemester(Semester rawdata) async{
     try{
@@ -75,6 +76,38 @@ Future<void> refreshLinkedDevices() async {
     }
     
 
+    
+  }
+  
+  ///note : id is semester int id , semester uuid used to filter courses nested in the semester
+  ///user uid used in the delete because it re-read the data , and it should know for which user uid
+  @override
+  Future<void> deleteSemesterCascade(int id, String semesterUuid ,String userUid) async {
+    try{
+      //local
+      final nestedCoursesId = await ref.read(writeCourseProvider.notifier).findListOfCourseByUUIDNestedInSemesterX(semesterUuid);
+      if(nestedCoursesId == null) throw Error();
+      await ref.read(semesterProvider.notifier).deleteData(id, userUid, nestedCoursesId);
+
+      //cloud
+      Future<void> f() async {
+        try {
+    await ref.read(semesterCloudProvider.notifier).deleteSemester(semesterUuid);
+    for (final courseUuid in nestedCoursesId) {
+      await ref.read(courseCloudProvider.notifier).deleteCourse(courseUuid);
+    }
+  } catch (e, st) {
+    logger.e('Cloud cascade delete failed', error: e, stackTrace: st);
+  }
+      }
+      unawaited(
+        f()
+      );
+
+    } catch(e){
+      logger.e(e);
+      rethrow;
+    }
     
   }
 

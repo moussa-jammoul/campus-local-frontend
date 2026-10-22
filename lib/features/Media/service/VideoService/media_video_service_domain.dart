@@ -19,9 +19,7 @@ abstract class MediaVideoServicesDomain {
 
   Future<void> updateMedia(MediaForm data);
   
-  ///only deleting things locally , for more information , go to media cloud domain
-  ///inside core/database/cloud/domain  ,we need uuid to also delete the thumbnail
-  Future<void> deleteMedia(String uuid);
+  
   
   ///it will handle the ui request that they are outside the render box for caching videos
   ///thumbnails

@@ -39,12 +39,13 @@ final routerProvider = Provider<GoRouter>((ref){
  final routerNotifier = RefreshListenAbleRouterNotifier(ref);
 
  return GoRouter(
+  debugLogDiagnostics: true,
     navigatorKey: navigatorKey,
     refreshListenable:routerNotifier ,
     
     initialLocation: '/home',
     redirect: (context, state) {
-      //checking auth states , redirectResult used to be the result of chaining redirects 
+      
       String? redirectResult = ref.read(routerRedirectLogiqueProvider.notifier).authRedirect(state);
       if (redirectResult != null){
         return redirectResult;

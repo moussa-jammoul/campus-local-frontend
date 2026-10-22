@@ -560,7 +560,7 @@ String _formatDate(DateTime? date) {
 
 ///those widgets under here are used for editing a semester
 
-class _EditingSemesterDialogContent extends StatefulWidget {
+class _EditingSemesterDialogContent extends ConsumerStatefulWidget {
   const _EditingSemesterDialogContent({
     required this.sem,
     required this.initialName,// we prefered to pass those excplicity instead of using the semester because they are describing what they should be used for (e.g initial value which was already the semester information)
@@ -574,12 +574,14 @@ class _EditingSemesterDialogContent extends StatefulWidget {
   final Semester sem;
 
   @override
-  State<_EditingSemesterDialogContent> createState() =>
-      __EditingSemesterDialogContentState();
+  ConsumerState<_EditingSemesterDialogContent> createState() {
+    return __EditingSemesterDialogContentState();
+  }
+
 }
 
 class __EditingSemesterDialogContentState
-    extends State<_EditingSemesterDialogContent> {
+    extends ConsumerState<_EditingSemesterDialogContent> {
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
   late bool _isDone;
@@ -819,6 +821,65 @@ class __EditingSemesterDialogContentState
                     ],
                   ),
                 ),
+                const SizedBox(height: 12,),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                    backgroundColor: Theme.of(context).colorScheme.error
+
+                   
+                    ),
+                  onPressed: () async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) {
+      final scheme = Theme.of(dialogContext).colorScheme;
+
+      return AlertDialog(
+        title: const Text('Delete semester'),
+        content: Text(
+          'Are you sure you want to delete "${widget.sem.semesterName}"?\n\n'
+          'Deleting a semester will delete all its nested courses. '
+          'Your media will not be deleted, you can access them any time.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: scheme.error,
+              foregroundColor: scheme.onError,
+            ),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      );
+    },
+  );
+
+  
+  if (confirmed != true) return;
+  if(context.mounted){
+  Navigator.of(context).pop();
+  }
+
+  unawaited(
+    ref.read(homePageServiceProvider.notifier).deleteSemesterCascade(
+          widget.sem.id!,
+          widget.sem.uuid!,
+          widget.sem.userUid,
+        ),
+  );
+},
+                  child: Center(
+                    child: Text('DELETE'),
+                  )
+                  )
               ],
             ),
           ),

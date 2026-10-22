@@ -42,7 +42,7 @@ class DetailedImage extends ConsumerWidget {
           .read(mediaProvider)
           ?.firstWhereOrNull((m) => m.uuid == imageDetail.uuid) ??
       imageDetail;                        
-      MediaDetailSheet.show(context, live);
+      MediaDetailSheet.show(context: context, media: live);
       },
       icon: const Icon(Icons.menu),
     ),

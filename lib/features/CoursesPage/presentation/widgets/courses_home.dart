@@ -534,7 +534,7 @@ String _formatDate(DateTime? date) {
 
 ///those widgets under here are used for editing a course
 
-class _EditingCourseDialogContent extends StatefulWidget {
+class _EditingCourseDialogContent extends ConsumerStatefulWidget {
   const _EditingCourseDialogContent({
     required this.course,
     required this.initialName,
@@ -548,10 +548,10 @@ class _EditingCourseDialogContent extends StatefulWidget {
   final Course course;
 
   @override
-  State<_EditingCourseDialogContent> createState() => __EditingCourseDialogContentState();
+  ConsumerState<_EditingCourseDialogContent> createState() => __EditingCourseDialogContentState();
 }
 
-class __EditingCourseDialogContentState extends State<_EditingCourseDialogContent> {
+class __EditingCourseDialogContentState extends ConsumerState<_EditingCourseDialogContent> {
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
   late final TextEditingController _professorController;
@@ -771,6 +771,65 @@ class __EditingCourseDialogContentState extends State<_EditingCourseDialogConten
                     ],
                   ),
                 ),
+                 const SizedBox(height: 12,),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                    backgroundColor: Theme.of(context).colorScheme.error
+
+                   
+                    ),
+                  onPressed: () async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) {
+      final scheme = Theme.of(dialogContext).colorScheme;
+
+      return AlertDialog(
+        title: const Text('Delete semester'),
+        content: Text(
+          'Are you sure you want to delete "${widget.course.courseName}"?\n\n'
+          'Your media will not be deleted, you can access them any time.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: scheme.error,
+              foregroundColor: scheme.onError,
+            ),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      );
+    },
+  );
+
+  
+  if (confirmed != true) return;
+  if(context.mounted){
+  Navigator.of(context).pop();
+  }
+
+  unawaited(
+    ref.read(coursePageServiceProvider.notifier).deleteCourse(
+      widget.course.uuid!,
+      widget.course.id!,
+      widget.course.semesterUuid
+         
+        ),
+  );
+},
+                  child: Center(
+                    child: Text('DELETE'),
+                  )
+                  )
               ],
             ),
           ),

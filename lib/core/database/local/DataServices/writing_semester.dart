@@ -53,8 +53,8 @@ class WritingSemester extends Notifier<void> {
   }
   
 
-  ///used to get a semester by uuid , i personally used only inside preventing echo writes for updating
-  ///u may use it anywhere else
+  ///used to get a semester by uuid ,used inside preventing echo writes for updating
+  ///u may use it anywhere else 
   Future<Semester?> findByUuid(String uuid) async {
   if (db == null) return null;
   final row = await (db!.select(db!.semesterDB)..where((t) => t.uuid.equals(uuid))).getSingleOrNull();
@@ -148,12 +148,36 @@ class WritingSemester extends Notifier<void> {
     }
   }
 
-  Future<void> deleteData(int id) async {
+  Future<void> deleteDataCascadeBySemesterUuid(String uuid, List<String> coursesNestedUUID) async {
+    if (db != null) {
+      logger.i('deleting semester locally, uuid : $uuid');
+      try {
+        await (db!.transaction(() async{
+           await (db!.delete(db!.courseDB)..where((t)=>t.uuid.isIn(coursesNestedUUID))).go();
+           await (db!.delete(db!.semesterDB)..where((t) => t.uuid.equals(uuid))).go();
+        },));
+       
+        logger.i('deleted semester successfully, id: $uuid , and courses : $coursesNestedUUID');
+      } catch (e) {
+        logger.e(e);
+        rethrow;
+      }
+    } else {
+      logger.e('db is null, cannot delete semester');
+      throw Error();
+    }
+  }
+
+  Future<void> deleteDataCascade(int id , List<String> coursesNestedUUID) async {
     if (db != null) {
       logger.i('deleting semester locally, id: $id');
       try {
-        await (db!.delete(db!.semesterDB)..where((t) => t.id.equals(id))).go();
-        logger.i('deleted semester successfully, id: $id');
+        await (db!.transaction(() async{
+           await (db!.delete(db!.courseDB)..where((t)=>t.uuid.isIn(coursesNestedUUID))).go();
+           await (db!.delete(db!.semesterDB)..where((t) => t.id.equals(id))).go();
+        },));
+       
+        logger.i('deleted semester successfully, id: $id , and courses : $coursesNestedUUID');
       } catch (e) {
         logger.e(e);
         rethrow;

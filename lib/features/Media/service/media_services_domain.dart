@@ -26,5 +26,11 @@ abstract class MediaServicesDomain {
   ///we call this)
   
   Future<void> readData(String courseUuid , List<String>? fileextention);
+
+  ///note that we prefere to put delete media in the generale media service
+  ///because common in all files type and used in the same sheet used by all media
+  Future<void> deleteMedia(String uuid );
+
+  Future<void> deleteVideoThumbnail(String path );
   
 }

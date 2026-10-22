@@ -1,27 +1,33 @@
 
 
+// ignore_for_file: use_build_context_synchronously, must_be_immutable
+
 import 'dart:async';
 import 'dart:ui'; 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/ImageService/media_image_service.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services.dart';
 
 
 
 ///this function we can used for any type of media ,it doesn't care if it is an image , video , or any file type
+/// why delete follow the used method under there ? because if it is an image or a file , we only need to delete
+/// the bytes them self , which we can find them by uuid , for a video , we need to delete two elements, the video itself
+/// + the video thumbnail which we use directly the path of it to delete it 
 class MediaDetailSheet extends ConsumerStatefulWidget {
-  const MediaDetailSheet({super.key, required this.media});
+  MediaDetailSheet({super.key, required this.media , this.thumbnailPath});
 
   final MediaForm media;
-
-  static Future<void> show(BuildContext context, MediaForm media) {
+  String? thumbnailPath;/// if the media is a video , we pass the thumbnail path (used to delete the thumbnail)
+  static Future<void> show({required BuildContext context, required MediaForm media ,String? thumbnail }) {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withValues(alpha: 0.3),
-      builder: (_) => MediaDetailSheet(media: media),
+      builder: (_) => MediaDetailSheet(media: media , thumbnailPath: thumbnail),
     );
   }
 
@@ -230,6 +236,79 @@ class _MediaDetailSheetState extends ConsumerState<MediaDetailSheet> {
                       child: const Text('Save changes'),
                     ),
                   ),
+                  const SizedBox(height: 12,),
+                  SizedBox(
+                    width: double.infinity,
+                    child:FilledButton(
+                  style: FilledButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                    backgroundColor: Theme.of(context).colorScheme.error
+
+                   
+                    ),
+                  onPressed: () async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) {
+      final scheme = Theme.of(dialogContext).colorScheme;
+
+      return AlertDialog(
+        title: const Text('Delete Media'),
+        content: Text(
+          'You sure you want to delete the current media ?'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: scheme.error,
+              foregroundColor: scheme.onError,
+            ),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      );
+    },
+  );
+
+  
+                 if (confirmed != true) return;
+                 if(mounted) Navigator.of(context).pop();
+                 try{
+                 await ref.read(mediaServiceProvider.notifier).deleteMedia(media.uuid!);
+                 if(widget.thumbnailPath != null){
+                  await ref.read(mediaServiceProvider.notifier).deleteVideoThumbnail(widget.thumbnailPath!);
+                 }
+                 ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Media deleted !'),
+                    duration: Duration(seconds: 2), 
+                    )
+                    
+                  );
+                 }catch(e){
+                   ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('failed to delete the media'),
+                    duration: Duration(seconds: 2), 
+                    )
+                    
+                  );
+
+                 }
+                 },
+                  child: Center(
+                    child: Text('DELETE'),
+                  )
+                  )  ,
+                  )
+
                 ],
               ),
             ),

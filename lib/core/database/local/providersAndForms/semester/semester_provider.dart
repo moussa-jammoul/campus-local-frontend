@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/semester_cloud_domain.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_courses.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_semester.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 
@@ -75,9 +76,16 @@ Future<void> listenToCloudUpdates() async {
         } else {
           await updateData(incoming);
         }
+        
+        
+        case DocumentChangeType.removed:{
+          final sem = Semester.fromFirestore(change.doc.data()!, change.doc.id);
+          final coursesIDs =await ref.read(writeCourseProvider.notifier).findListOfCourseByUUIDNestedInSemesterX(sem.uuid!);
+          if(coursesIDs == null) return;
+          await deleteDataByuuid(sem.uuid!, sem.userUid, coursesIDs);
+        }
 
-        case DocumentChangeType.removed:
-          // TODO: handle delete logic when delete logic exists
+          
       }
     }
   });
@@ -126,11 +134,26 @@ Future<void> listenToCloudUpdates() async {
       rethrow;
     }
   }
+  
+  //delete semester  , delete all nested course , this one used to delete by uuid of semester
+  //this one used when we get notify that the semester is deleted from firestore
+  Future<void> deleteDataByuuid(String uuid, String userUid , List<String> nestedCoursesId) async{
+     logger.i('deleting semester, uuid : $uuid, userUid: $userUid');
+    try {
+      await ref.read(writeSemesterProvider.notifier).deleteDataCascadeBySemesterUuid(uuid , nestedCoursesId);
+      await readData(userUid);
+    } catch (e) {
+      logger.e(e);
+      rethrow;
+    }
 
-  Future<void> deleteData(int id, String userUid) async {
+  }
+
+  //delete semester ,delete all nested course , for more details go to core/database/local/writing_semester.dart
+  Future<void> deleteData(int id, String userUid , List<String> nestedCoursesId) async {
     logger.i('deleting semester, id: $id, userUid: $userUid');
     try {
-      await ref.read(writeSemesterProvider.notifier).deleteData(id);
+      await ref.read(writeSemesterProvider.notifier).deleteDataCascade(id , nestedCoursesId);
       await readData(userUid);
     } catch (e) {
       logger.e(e);

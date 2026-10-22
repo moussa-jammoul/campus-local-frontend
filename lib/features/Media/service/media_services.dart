@@ -3,16 +3,22 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/media_cloud_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/media_provider.dart';
+import 'package:flutterfrontenduniprojectmanager/core/storage/media/media_management.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/lastSynced/last_synced_data.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services_domain.dart';
 
 class MediaServices extends Notifier<void> implements MediaServicesDomain {
+  final allowedFormatVideo = ['mp4', 'mov', 'mkv', 'avi'];
+  final allowedFormatImage = ['jpg' , 'png'];
+  final allowedFileFormat = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'zip'];
 
   @override
   void build() {
@@ -129,6 +135,69 @@ class MediaServices extends Notifier<void> implements MediaServicesDomain {
     if(result == null) return null;
     return (result.path , result.extension?.toLowerCase());
   
+  }
+   
+
+  
+  @override
+  Future<void> deleteMedia(String uuid ) async {
+   
+    try {
+      //local
+      final existing = ref.read(mediaProvider)?.firstWhereOrNull((m) => m.uuid == uuid);
+
+      if (existing == null) {
+        
+        return;
+      }
+      await ref.read(mediaProvider.notifier).deleteMedia(existing.id!);
+      await ref.read(mediaManagmentProvider.notifier).deleteMediaFile(existing.filepath);
+      
+
+      ///replacing the deleted one with a media , why we need it ? because when a user keep deleting a lot of
+      ///media , remember we load paginated data when a user hit the scroll max ,when the user delete specific number
+      ///of media ,we will never hit this max and stuck without the able to scroll
+      await ref.read(mediaProvider.notifier).loadPaginatedMediaForACourse(
+        existing.userUid,
+        existing.courseUuid,
+        1,//loading one
+        _returnRelatedMedia(existing.filetype)
+      );
+
+      //cloud
+      unawaited(
+         ref.read(mediaCloudProvider.notifier).deleteMedia(uuid)
+      );
+      
+    } catch (e) {
+      throw Error();
+    }
+  }
+
+  @override
+  Future<void> deleteVideoThumbnail(String path) async {
+    try{
+      await ref.read(mediaManagmentProvider.notifier).deleteMediaFile(path);
+    } catch(e){
+      throw Error();
+    }
+    
+  }
+  
+
+  //small helper so we return related type of media , used inside delete to load
+  //a media with the same related type
+  List<String> _returnRelatedMedia(String type){
+    if(allowedFileFormat.contains(type)){
+      return allowedFileFormat;
+    }
+    else if(allowedFormatVideo.contains(type)){
+      return allowedFormatVideo;
+    }
+    else{
+      return allowedFormatImage;
+    }
+
   }
 }
 

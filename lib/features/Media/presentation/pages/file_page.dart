@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/form.dart';
@@ -238,9 +239,15 @@ void _showMessage(BuildContext context, String message) {
       ),
       child: GestureDetector(
         onLongPress: () {
-          unawaited(
-          MediaDetailSheet.show(context, mediaItem)
-          );
+            ///reading the last state of a media , because the passed imageDetail could hold
+        ///ghost data if the user updated the media and didn't exit the picture , so he 
+        ///will never see that the update really did anything , instead we rely here on always
+        ///reading the new media 
+        final live = ref
+          .read(mediaProvider)
+          ?.firstWhereOrNull((m) => m.uuid == mediaItem.uuid) ??
+      mediaItem;                        
+      MediaDetailSheet.show(context: context, media: live);
         },
         onTap: ()  {
           unawaited(openfile(ref , context));  

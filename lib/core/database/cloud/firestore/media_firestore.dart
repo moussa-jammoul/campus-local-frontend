@@ -160,5 +160,16 @@ class  MediaFirestore extends Notifier<void> implements MediaCloudDomain {
   
   }
 
+  @override
+  Future<void> deleteMedia(String uuid) async {
+    try{
+      await docRef.doc(uuid).delete();
+    } catch(e){
+      logger.e(e);
+      rethrow;
+    }
+    
+  }
+
 
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/courses_cloud_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/courses_provider.dart';
@@ -16,7 +17,7 @@ class CoursePageServices extends Notifier<void> implements CoursePageServicesDom
     logger = ref.read(loggerProvider);
   }
 
-  //TODO: build delete course, same note as semester's delete, deleting requires cleaning up nested media first
+  
 
   @override
   Future<void> createNewCourse(Course rawdata) async {
@@ -30,6 +31,7 @@ class CoursePageServices extends Notifier<void> implements CoursePageServicesDom
       );
     } catch (e) {
       logger.e(e);
+      rethrow;
     }
   }
 
@@ -47,6 +49,7 @@ class CoursePageServices extends Notifier<void> implements CoursePageServicesDom
       );
     } catch (e) {
       logger.e(e);
+      rethrow;
     }
   }
   
@@ -55,6 +58,28 @@ class CoursePageServices extends Notifier<void> implements CoursePageServicesDom
   @override
   void nullCurrentCourses() {
     ref.read(courseProvider.notifier).removeCurrentState();
+  }
+
+  @override
+  Future<void> deleteCourse(String uuid , int id , String semesterUuid) async{
+    if(FirebaseAuth.instance.currentUser != null){
+    try{
+      //local
+      await ref.read(courseProvider.notifier).deleteData(id, FirebaseAuth.instance.currentUser!.uid , semesterUuid);
+
+      ///for the local-first architecture , we don't need to wait firestore function here
+      ///because it will keep trying until connection resolve
+      unawaited(
+        ref.read(courseCloudProvider.notifier).deleteCourse(uuid),
+      );
+
+    } catch(e){
+      logger.e(e);
+      rethrow;
+    }
+    } else{
+      throw Error();
+    }
   }
 }
 

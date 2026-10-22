@@ -38,27 +38,6 @@ class MediaVideoService extends Notifier<void> implements MediaVideoServicesDoma
     }
   }
 
-  @override
-  Future<void> deleteMedia(String uuid) async {
-    logger.i('deleting image media, id: $uuid');
-    try {
-      final existing = ref.read(mediaProvider)?.firstWhereOrNull((m) => m.uuid == uuid);
-
-      if (existing == null) {
-        logger.w('media with id $uuid not found in local state, skipping file deletion');
-        return;
-      }
-
-      await ref.read(mediaManagmentProvider.notifier).deleteMediaFile(existing.filepath);
-      if(existing.id == null){
-        logger.w("id of the media is null , meaning somehow the db failed to assign an id , skipping db delete...");
-        return ;
-      }
-      await ref.read(mediaProvider.notifier).deleteMedia(existing.id!);
-    } catch (e) {
-      logger.e(e);
-    }
-  }
 
 
   @override
@@ -141,7 +120,7 @@ class MediaVideoService extends Notifier<void> implements MediaVideoServicesDoma
 
   @override
   Future<String?> returnVideoExplicitePath(String relativePath) async {
-    logger.e("grabing video path for the relative path : $relativePath");
+    logger.i("grabing video path for the relative path : $relativePath");
     try{
     final path = await ref.read(mediaManagmentProvider.notifier).grabVideoPath(relativePath: relativePath);
     return path;

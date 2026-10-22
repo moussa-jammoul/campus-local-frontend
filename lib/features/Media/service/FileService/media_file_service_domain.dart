@@ -14,9 +14,7 @@ abstract class MediaFileServiceDomain {
 
   Future<void> updateMedia(MediaForm data);
   
-  ///only deleting things locally , for more information , go to media cloud domain
-  ///inside core/database/cloud/domain
-  Future<void> deleteMedia(int id);
+ 
 
   Future<OpenResult> openFileViaExternalApp(String explicitPath);
    Future<String?> grabExplicitPath(String relativePath);

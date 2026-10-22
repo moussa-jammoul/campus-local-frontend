@@ -55,6 +55,9 @@ abstract class MediaCloudDomain {
   Future<List<MediaForm>?> syncMedia(String lastUUIDmediaInsertedLocally , DateTime lastTimeUpdatedDataFromTheCloud);
   Future<List<MediaForm>?> fetchAllMedia();
 
+  //delete only delete the media meta data on the cloud , it doesn't delete the media on other devices
+  Future<void> deleteMedia(String uuid);
+
 
 }
 

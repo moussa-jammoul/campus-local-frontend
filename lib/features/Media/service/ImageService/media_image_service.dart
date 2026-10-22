@@ -90,23 +90,7 @@ Future<void> addMedia({
     }
   }
 
-  @override
-  Future<void> deleteMedia(int id) async {
-    logger.i('deleting image media, id: $id');
-    try {
-      final existing = ref.read(mediaProvider)?.firstWhereOrNull((m) => m.id == id);
-
-      if (existing == null) {
-        logger.w('media with id $id not found in local state, skipping file deletion');
-        return;
-      }
-
-      await ref.read(mediaManagmentProvider.notifier).deleteMediaFile(existing.filepath);
-      await ref.read(mediaProvider.notifier).deleteMedia(id);
-    } catch (e) {
-      logger.e(e);
-    }
-  }
+  
 
   @override
   Future<void> markInvisibleImage(int id) async {

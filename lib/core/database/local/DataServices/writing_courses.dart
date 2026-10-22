@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_semester.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/db/main_db.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
@@ -71,11 +72,25 @@ class WritingCourse extends Notifier<void> {
       updatedAt: row.updatedAt,
     );
   }
+  
+
+  ///used to filter courses who belong to a semester , used when we delete a semester so we delete
+  ///nested courses
+  Future<List<String>?> findListOfCourseByUUIDNestedInSemesterX(String semesterUuid) async{
+    if(db == null) return null;
+    final rows = await (db!.select(db!.courseDB)..where((t) => t.semesterUuid.equals(semesterUuid))).get();
+    return rows.map(
+      (row){
+        return row.uuid;
+      }
+    ).toList();
+  }
 
   Future<Course> writeData(Course data) async {
     if (db != null) {
       logger.i('writing data locally: $data');
       try {
+       
         final inserted = await db!.into(db!.courseDB).insertReturning(
               CourseDBCompanion.insert(
                 uuid: data.uuid != null ? Value(data.uuid!) : const Value.absent(),
@@ -115,6 +130,7 @@ class WritingCourse extends Notifier<void> {
     if (db != null) {
       logger.i('updating course locally: $data');
       try {
+       
         final inserted = await (db!.update(db!.courseDB)..where((t) => t.uuid.equals(data.uuid!)))
             // we used uuid here because id is null even if the update came from firestore,
             // again id is local only
@@ -170,6 +186,23 @@ class WritingCourse extends Notifier<void> {
       logger.e('db is null, cannot delete course');
       throw Error();
     }
+  }
+
+  Future<void> deleteDataByUuid(String uuid) async{
+    if (db != null) {
+      logger.i('deleting course locally, uuid $uuid');
+      try {
+        await (db!.delete(db!.courseDB)..where((t) => t.uuid.equals(uuid))).go();
+        logger.i('deleted course successfully, uuid : $uuid');
+      } catch (e) {
+        logger.e(e);
+        rethrow;
+      }
+    } else {
+      logger.e('db is null, cannot delete course');
+      throw Error();
+    }
+
   }
 }
 

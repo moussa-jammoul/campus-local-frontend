@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_media.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
+import 'package:flutterfrontenduniprojectmanager/core/storage/media/media_management.dart';
 import 'package:flutterfrontenduniprojectmanager/router/router.dart';
 import 'package:logger/web.dart';
 
@@ -19,13 +21,20 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
     logger = ref.read(loggerProvider);
     return null;
   }
-
+  
+  ///NOTE : id used to delete the meta data of the image locally , deleting 
+  ///the media itself (the file) we call another function we call it in the service side
   Future<void> deleteMedia(int id) async {
     logger.i('deleting media, id: $id');
     try {
       await ref.read(writeMediaProvider.notifier).deleteData(id);
+
+     final current = state;
+     if (current != null) {
+        state = current.where((m) => m.id != id).toList();
+     }
       logger.i('deleted media successfully, id: $id');
-    } catch (e) {
+    } catch (e) { 
       logger.e(e);
       rethrow;
     }
