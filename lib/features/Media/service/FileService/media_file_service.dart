@@ -7,7 +7,10 @@ import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAn
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/media_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/storage/media/media_management.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/favorite_filter.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/FileService/media_file_service_domain.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/service/FilterService/filter_media_services.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services.dart';
 import 'package:logger/logger.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:uuid/uuid.dart';
@@ -15,6 +18,7 @@ import 'package:uuid/uuid.dart';
 class MediaFileService extends Notifier<void> implements MediaFileServiceDomain {
 
   late Logger logger;
+  final allowedFileFormat = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'zip'];
 
   @override
   void build() {
@@ -33,6 +37,9 @@ class MediaFileService extends Notifier<void> implements MediaFileServiceDomain 
     })async {
       logger.i('adding new image media for courseUuid: $courseUuid');
   try { 
+    ///here we just handle some state stuff , like remove the filters to the state 
+    
+    ref.read(filterServicesProvider.notifier).resetFilters();
     ///generating the uuid it outside the db , because we need it in the save media file before we insert 
     ///it to the db (we need the extra data)
     final mediaUuid = const Uuid().v7();
@@ -58,7 +65,7 @@ class MediaFileService extends Notifier<void> implements MediaFileServiceDomain 
     );
 
     final inserted = await ref.read(mediaProvider.notifier).addNewMedia(data);
-
+    await ref.read(mediaServiceProvider.notifier).refreshDataLocally(courseUuid, allowedFileFormat , false);
     ///local-first architecture: we don't wait on the cloud push here,
     ///it will keep retrying until connection resolves
     unawaited(

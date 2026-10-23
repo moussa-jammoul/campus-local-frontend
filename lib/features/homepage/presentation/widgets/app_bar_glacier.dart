@@ -189,7 +189,7 @@ class HeaderGreetingSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Track your enrolled courses, progress, and schedules , completely offline !.',
+                    'Track your enrolled courses, progress, and schedules , completely offline !',
                     style: textTheme.bodyMedium?.copyWith(
                       color: scheme.onSurfaceVariant.withValues(alpha: 0.8),
                       height: 1.25,

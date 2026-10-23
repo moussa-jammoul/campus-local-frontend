@@ -29,7 +29,14 @@ class MediaServices extends Notifier<void> implements MediaServicesDomain {
   
   
   @override
-  Future<void> fetchCloudData(String? courseUuid , List<String>? fileextention) async {
+  Future<void> fetchCloudData(
+    {
+     String? courseUuid , 
+     List<String>? fileextention ,
+     bool fromAVisiblePageToRenderData = true,//used to check if the refresh come from a page or app startup
+     bool isFav = false
+    }
+    ) async {
   if (FirebaseAuth.instance.currentUser == null) {
     return;
   }
@@ -59,34 +66,42 @@ class MediaServices extends Notifier<void> implements MediaServicesDomain {
 
   await ref.read(mediaProvider.notifier).addListOfMedia(data);
 
-  ///if courseUuid != null, it mean this was called from the refresh button for a specific course
-  ///if == null, this was called at app startup, no need to reload a course's paginated view
-  ///no need to wait it , because we will use a sync... ui for the previous steps
-  ///here it is just a local refresh
-  unawaited(refreshDataLocally(courseUuid , fileextention));
+  
+  if(fromAVisiblePageToRenderData){
+  unawaited(refreshDataLocally(courseUuid , fileextention , isFav));
+  }
   
 }
 
   @override
-  Future<void> refreshDataLocally(String? courseUuid , List<String>? fileextention) async {
-    if (courseUuid != null) {
+  Future<void> refreshDataLocally(String? courseUuid , List<String>? fileextention , bool isFav) async {
+    
     ref.read(mediaProvider.notifier).resetMediaState();
     await ref.read(mediaProvider.notifier).loadPaginatedMediaForACourse(
+          userUid: 
           FirebaseAuth.instance.currentUser!.uid,
+          courseUuid: 
           courseUuid,
-          70,
-          fileextention
+          limit: 
+          30,
+          fileextention: 
+          fileextention,
+          isFav: isFav
         );
-  }
+
     
   }
 
   @override
-  Future<void> readData(String courseUuid, List<String>? fileextention) async {
+  Future<void> readData(String? courseUuid, List<String>? fileextention) async {
     await ref.read(mediaProvider.notifier).loadPaginatedMediaForACourse(
+          userUid: 
           FirebaseAuth.instance.currentUser!.uid,
+          courseUuid: 
           courseUuid,
-          50,
+          limit: 
+          30,
+          fileextention: 
           fileextention
         );
   }
@@ -158,9 +173,13 @@ class MediaServices extends Notifier<void> implements MediaServicesDomain {
       ///media , remember we load paginated data when a user hit the scroll max ,when the user delete specific number
       ///of media ,we will never hit this max and stuck without the able to scroll
       await ref.read(mediaProvider.notifier).loadPaginatedMediaForACourse(
+        userUid: 
         existing.userUid,
+        courseUuid: 
         existing.courseUuid,
-        1,//loading one
+        limit: 
+        1,
+        fileextention: //loading one
         _returnRelatedMedia(existing.filetype)
       );
 

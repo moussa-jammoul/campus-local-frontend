@@ -57,10 +57,18 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
     }
   }
 
-  Future<void> loadPaginatedMediaForACourse(String userUid, String courseUuid, int limit , List<String>? fileextention) async {
+  Future<void> loadPaginatedMediaForACourse(
+    {
+    required String userUid, 
+    String? courseUuid, 
+    int limit = 30 , 
+    List<String>? fileextention,
+    bool isFav = false,
+    }
+    ) async {
     logger.i('loading paginated media for courseUuid: $courseUuid, alreadyRead: $alreadyRead, limit: $limit');
     try {
-      final data = await ref.read(writeMediaProvider.notifier).readData(userUid, courseUuid, limit, alreadyRead , fileextention);
+      final data = await ref.read(writeMediaProvider.notifier).readData(userUid, courseUuid, limit, alreadyRead , fileextention , isFav);
       if (data != null && state != null) {
         state = [...state!, ...data];
       } else {

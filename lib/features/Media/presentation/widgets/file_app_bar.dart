@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/file_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/add_file_sheet.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/favorite_filter.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/FileService/media_file_service.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services.dart';
 import 'package:go_router/go_router.dart';
@@ -69,6 +70,10 @@ class FileAppBar extends ConsumerWidget {
         ),
       ),
       actions: [
+        FavoritesButton(
+          courseUuid: courseDetails.uuid,
+          types:allowedFileFormat ,
+        ),
         IconButton(
           icon: const Icon(Icons.add_rounded, size: 20),
           onPressed: () {
@@ -81,7 +86,7 @@ class FileAppBar extends ConsumerWidget {
             unawaited(
               ref
                   .read(mediaServiceProvider.notifier)
-                  .fetchCloudData(courseDetails.uuid, allowedFileFormat),
+                  .fetchCloudData(courseUuid:  courseDetails.uuid,fileextention:  allowedFileFormat),
             );
           },
           icon: const Icon(Icons.refresh),

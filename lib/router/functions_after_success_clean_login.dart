@@ -75,7 +75,7 @@ Future<void> startListeningToUpdated(User user, Logger logger, Ref ref) async{
 
   ///fetch cloud data for all media , it is not a listener , but a single fetch , for more details
   ///go to core/database/cloud/domain/media_cloud_domain.dart
-  unawaited(ref.read(mediaServiceProvider.notifier).fetchCloudData(null, null));
+  unawaited(ref.read(mediaServiceProvider.notifier).fetchCloudData(fromAVisiblePageToRenderData: false));
 
 
 }

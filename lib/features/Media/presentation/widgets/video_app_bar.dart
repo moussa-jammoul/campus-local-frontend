@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/add_video_sheet.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/favorite_filter.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/VideoService/media_video_service.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services.dart';
 import 'package:flutterfrontenduniprojectmanager/router/router.dart';
@@ -108,6 +109,10 @@ class VideoAppBar extends ConsumerWidget {
         ),
       ),
       actions: [
+        FavoritesButton(
+          courseUuid: courseDetails.uuid,
+          types: allowedFormat,
+        ),
         IconButton(
           icon: const Icon(Icons.add_rounded, size: 20),
           onPressed: () {
@@ -120,7 +125,7 @@ class VideoAppBar extends ConsumerWidget {
             unawaited(
               ref
                   .read(mediaServiceProvider.notifier)
-                  .fetchCloudData(courseDetails.uuid, allowedFormat),
+                  .fetchCloudData(courseUuid:  courseDetails.uuid,fileextention:  allowedFormat),
             );
           },
           icon: const Icon(Icons.refresh),

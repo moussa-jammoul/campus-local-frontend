@@ -8,7 +8,11 @@ abstract class MediaServicesDomain {
   ///in app opening , we run this funciton , it will decide which form
   ///of fetching data will use (e.g no data exist locally at all , or getting new updates)
   ///also use it for the refresh button inside the media ui
-  Future<void> fetchCloudData(String? courseUuid , List<String>? fileextention);
+  Future<void> fetchCloudData({
+     String? courseUuid , 
+     List<String>? fileextention ,
+     bool fromAVisiblePageToRenderData = true//used to check if the refresh come from a page or app startup
+    });
   
   Future<(String? sourcePath , String? type)?> pickVideo(List<String> type);
 
@@ -17,7 +21,7 @@ abstract class MediaServicesDomain {
   Future<(String? sourcePath , String? type)?> pickFile(List<String> type);
   ///only for local refresh , it read again paginated data of the very first 
   ///rows , no seperate button for it , only fetchcloud data call it 
-  Future<void> refreshDataLocally(String? courseUuid , List<String>? fileextention);
+  Future<void> refreshDataLocally(String? courseUuid , List<String>? fileextention , bool isFav);
 
   ///when we open a course / specific type , we should read paginated local
   ///data , we use this function to do it, the different between it and _refresh local data

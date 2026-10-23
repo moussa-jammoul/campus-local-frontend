@@ -25,7 +25,7 @@ void main() async {
   await Firebase.initializeApp(); //insuring firebase initialization
   
 
-  ///getting theme mode set by user or null so we use the system of his device
+  ///fetching theme mode set by user or null so we use the system of his device
   final prefs = await SharedPreferences.getInstance();
   final isDark = prefs.getBool(isDarkKey); // null if never set
   final initialThemeMode =

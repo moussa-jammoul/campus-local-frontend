@@ -5,6 +5,7 @@ import 'package:flutterfrontenduniprojectmanager/core/database/local/DataService
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/CoursesPage/presentation/page/courses_page.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/all_media_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/detailed_image.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/file_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/image_page.dart';
@@ -79,6 +80,15 @@ final routerProvider = Provider<GoRouter>((ref){
           return HomePage();
         },
         routes: [
+
+          GoRoute(
+            path: 'allmedia',
+            builder: (context, state) {
+              return AllMediaPage();
+            },
+          ),
+
+
           GoRoute(
             path: 'settings',
             builder: (context, state) {

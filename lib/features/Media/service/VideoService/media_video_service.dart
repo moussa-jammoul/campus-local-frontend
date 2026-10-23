@@ -11,12 +11,15 @@ import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAn
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/storage/media/cache/cache_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/storage/media/media_management.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/favorite_filter.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/service/FilterService/filter_media_services.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/VideoService/media_video_service_domain.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services.dart';
 import 'package:logger/web.dart';
 import 'package:uuid/uuid.dart';
 
 class MediaVideoService extends Notifier<void> implements MediaVideoServicesDomain {
-
+  final allowedFormatVideo = ['mp4', 'mov', 'mkv', 'avi'];
   late Logger logger;
  
   @override
@@ -72,6 +75,9 @@ class MediaVideoService extends Notifier<void> implements MediaVideoServicesDoma
      required bool isFavorite}) async{
       logger.i('adding new video media for courseUuid: $courseUuid');
       try { 
+        ///here we just handle some state stuff , like remove the filters to the state 
+    
+    ref.read(filterServicesProvider.notifier).resetFilters();
     ///generating the uuid it outside the db , because we need it in the save media file before we insert 
     ///it to the db (we need the extra data)
     final mediaUuid = const Uuid().v7();
@@ -100,7 +106,7 @@ class MediaVideoService extends Notifier<void> implements MediaVideoServicesDoma
     );
 
     final inserted = await ref.read(mediaProvider.notifier).addNewMedia(data);
-
+    await ref.read(mediaServiceProvider.notifier).refreshDataLocally(courseUuid, allowedFormatVideo , false);
     ///local-first architecture: we don't wait on the cloud push here,
     ///it will keep retrying until connection resolves
     unawaited(

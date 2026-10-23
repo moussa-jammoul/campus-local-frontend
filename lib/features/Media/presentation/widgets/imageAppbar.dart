@@ -10,6 +10,7 @@ import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAn
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/media_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/add_image_sheet.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/favorite_filter.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/ImageService/media_image_service.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services.dart';
 import 'package:go_router/go_router.dart';
@@ -72,6 +73,10 @@ class ImageAppBar extends ConsumerWidget {
         ),
       ),
       actions: [
+        FavoritesButton(
+          courseUuid: courseDetails.uuid,
+          types: ['png' , 'jpg'],
+        ),
         IconButton(
           icon: const Icon(Icons.add_rounded, size: 20),
           onPressed: () {
@@ -82,7 +87,7 @@ class ImageAppBar extends ConsumerWidget {
         IconButton(
           onPressed: (){
             unawaited(
-            ref.read(mediaServiceProvider.notifier).fetchCloudData(courseDetails.uuid, ['jpg' , 'png'])
+            ref.read(mediaServiceProvider.notifier).fetchCloudData(courseUuid:  courseDetails.uuid, fileextention: ['jpg' , 'png'])
             );
           }, 
           icon: Icon(

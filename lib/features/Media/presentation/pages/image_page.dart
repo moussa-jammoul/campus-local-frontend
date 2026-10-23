@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/media_provider.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/favorite_filter.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/imageAppbar.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/ImageService/media_image_service.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services.dart';
@@ -78,7 +79,7 @@ class _ImagePageState extends ConsumerState<ImagePage> {
       backgroundColor: scheme.surface,
       body: PopScope(
         onPopInvokedWithResult: (didPop, result) {
-          if (didPop) ref.read(mediaProvider.notifier).resetMediaState();
+       if (didPop) {ref.read(mediaProvider.notifier).resetMediaState();ref.read(currentFavStateProvider.notifier).resetToFalse();}
         },
         child: CustomScrollView(
           controller: _scrollController,       

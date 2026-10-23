@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/semester_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/userAdditionalData/additionalDataFromLogin/addional_data_from_login.dart';
+import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/all_media_tile.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/app_bar_glacier.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/semesters_home.dart';
 
@@ -60,7 +61,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
                   HeaderGreetingSection(),
+
+                  SizedBox(height: 10,),
+                  AllMediaTile(),
                   SizedBox(height: 24),
+
+
                   SemestersHome(),
                 ],
               ),

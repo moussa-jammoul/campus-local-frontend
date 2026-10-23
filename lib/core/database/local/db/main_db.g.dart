@@ -989,6 +989,7 @@ class $SemesterDBTable extends SemesterDB
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
     clientDefault: () => const Uuid().v7(),
   );
   static const VerificationMeta _userUidMeta = const VerificationMeta(
@@ -1501,6 +1502,7 @@ class $CourseDBTable extends CourseDB
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
     clientDefault: () => const Uuid().v7(),
   );
   static const VerificationMeta _userUidMeta = const VerificationMeta(
@@ -2058,6 +2060,7 @@ class $DeadLineDBTable extends DeadLineDB
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
     clientDefault: () => const Uuid().v7(),
   );
   static const VerificationMeta _userUidMeta = const VerificationMeta(
@@ -2125,6 +2128,30 @@ class $DeadLineDBTable extends DeadLineDB
       'CHECK ("notified" IN (0, 1))',
     ),
   );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -2135,6 +2162,8 @@ class $DeadLineDBTable extends DeadLineDB
     title,
     description,
     notified,
+    createdAt,
+    updatedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2206,6 +2235,18 @@ class $DeadLineDBTable extends DeadLineDB
     } else if (isInserting) {
       context.missing(_notifiedMeta);
     }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
     return context;
   }
 
@@ -2247,6 +2288,14 @@ class $DeadLineDBTable extends DeadLineDB
         DriftSqlType.bool,
         data['${effectivePrefix}notified'],
       )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
     );
   }
 
@@ -2265,6 +2314,8 @@ class DeadLineDBData extends DataClass implements Insertable<DeadLineDBData> {
   final String title;
   final String description;
   final bool notified;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   const DeadLineDBData({
     required this.id,
     required this.uuid,
@@ -2274,6 +2325,8 @@ class DeadLineDBData extends DataClass implements Insertable<DeadLineDBData> {
     required this.title,
     required this.description,
     required this.notified,
+    required this.createdAt,
+    required this.updatedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2288,6 +2341,8 @@ class DeadLineDBData extends DataClass implements Insertable<DeadLineDBData> {
     map['title'] = Variable<String>(title);
     map['description'] = Variable<String>(description);
     map['notified'] = Variable<bool>(notified);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
 
@@ -2303,6 +2358,8 @@ class DeadLineDBData extends DataClass implements Insertable<DeadLineDBData> {
       title: Value(title),
       description: Value(description),
       notified: Value(notified),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
     );
   }
 
@@ -2320,6 +2377,8 @@ class DeadLineDBData extends DataClass implements Insertable<DeadLineDBData> {
       title: serializer.fromJson<String>(json['title']),
       description: serializer.fromJson<String>(json['description']),
       notified: serializer.fromJson<bool>(json['notified']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
   @override
@@ -2334,6 +2393,8 @@ class DeadLineDBData extends DataClass implements Insertable<DeadLineDBData> {
       'title': serializer.toJson<String>(title),
       'description': serializer.toJson<String>(description),
       'notified': serializer.toJson<bool>(notified),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
 
@@ -2346,6 +2407,8 @@ class DeadLineDBData extends DataClass implements Insertable<DeadLineDBData> {
     String? title,
     String? description,
     bool? notified,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) => DeadLineDBData(
     id: id ?? this.id,
     uuid: uuid ?? this.uuid,
@@ -2355,6 +2418,8 @@ class DeadLineDBData extends DataClass implements Insertable<DeadLineDBData> {
     title: title ?? this.title,
     description: description ?? this.description,
     notified: notified ?? this.notified,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
   );
   DeadLineDBData copyWithCompanion(DeadLineDBCompanion data) {
     return DeadLineDBData(
@@ -2368,6 +2433,8 @@ class DeadLineDBData extends DataClass implements Insertable<DeadLineDBData> {
           ? data.description.value
           : this.description,
       notified: data.notified.present ? data.notified.value : this.notified,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
@@ -2381,7 +2448,9 @@ class DeadLineDBData extends DataClass implements Insertable<DeadLineDBData> {
           ..write('dueAt: $dueAt, ')
           ..write('title: $title, ')
           ..write('description: $description, ')
-          ..write('notified: $notified')
+          ..write('notified: $notified, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
@@ -2396,6 +2465,8 @@ class DeadLineDBData extends DataClass implements Insertable<DeadLineDBData> {
     title,
     description,
     notified,
+    createdAt,
+    updatedAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -2408,7 +2479,9 @@ class DeadLineDBData extends DataClass implements Insertable<DeadLineDBData> {
           other.dueAt == this.dueAt &&
           other.title == this.title &&
           other.description == this.description &&
-          other.notified == this.notified);
+          other.notified == this.notified &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
 }
 
 class DeadLineDBCompanion extends UpdateCompanion<DeadLineDBData> {
@@ -2420,6 +2493,8 @@ class DeadLineDBCompanion extends UpdateCompanion<DeadLineDBData> {
   final Value<String> title;
   final Value<String> description;
   final Value<bool> notified;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
   const DeadLineDBCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
@@ -2429,6 +2504,8 @@ class DeadLineDBCompanion extends UpdateCompanion<DeadLineDBData> {
     this.title = const Value.absent(),
     this.description = const Value.absent(),
     this.notified = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
   });
   DeadLineDBCompanion.insert({
     this.id = const Value.absent(),
@@ -2439,6 +2516,8 @@ class DeadLineDBCompanion extends UpdateCompanion<DeadLineDBData> {
     required String title,
     required String description,
     required bool notified,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
   }) : userUid = Value(userUid),
        dueAt = Value(dueAt),
        title = Value(title),
@@ -2453,6 +2532,8 @@ class DeadLineDBCompanion extends UpdateCompanion<DeadLineDBData> {
     Expression<String>? title,
     Expression<String>? description,
     Expression<bool>? notified,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2463,6 +2544,8 @@ class DeadLineDBCompanion extends UpdateCompanion<DeadLineDBData> {
       if (title != null) 'title': title,
       if (description != null) 'description': description,
       if (notified != null) 'notified': notified,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
 
@@ -2475,6 +2558,8 @@ class DeadLineDBCompanion extends UpdateCompanion<DeadLineDBData> {
     Value<String>? title,
     Value<String>? description,
     Value<bool>? notified,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
   }) {
     return DeadLineDBCompanion(
       id: id ?? this.id,
@@ -2485,6 +2570,8 @@ class DeadLineDBCompanion extends UpdateCompanion<DeadLineDBData> {
       title: title ?? this.title,
       description: description ?? this.description,
       notified: notified ?? this.notified,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -2515,6 +2602,12 @@ class DeadLineDBCompanion extends UpdateCompanion<DeadLineDBData> {
     if (notified.present) {
       map['notified'] = Variable<bool>(notified.value);
     }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
     return map;
   }
 
@@ -2528,7 +2621,9 @@ class DeadLineDBCompanion extends UpdateCompanion<DeadLineDBData> {
           ..write('dueAt: $dueAt, ')
           ..write('title: $title, ')
           ..write('description: $description, ')
-          ..write('notified: $notified')
+          ..write('notified: $notified, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
@@ -2560,6 +2655,7 @@ class $MediaDBTable extends MediaDB with TableInfo<$MediaDBTable, MediaDBData> {
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
     clientDefault: () => const Uuid().v7(),
   );
   static const VerificationMeta _userUidMeta = const VerificationMeta(
@@ -4325,6 +4421,8 @@ typedef $$DeadLineDBTableCreateCompanionBuilder =
       required String title,
       required String description,
       required bool notified,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
     });
 typedef $$DeadLineDBTableUpdateCompanionBuilder =
     DeadLineDBCompanion Function({
@@ -4336,6 +4434,8 @@ typedef $$DeadLineDBTableUpdateCompanionBuilder =
       Value<String> title,
       Value<String> description,
       Value<bool> notified,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
     });
 
 class $$DeadLineDBTableFilterComposer
@@ -4384,6 +4484,16 @@ class $$DeadLineDBTableFilterComposer
 
   ColumnFilters<bool> get notified => $composableBuilder(
     column: $table.notified,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -4436,6 +4546,16 @@ class $$DeadLineDBTableOrderingComposer
     column: $table.notified,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$DeadLineDBTableAnnotationComposer
@@ -4472,6 +4592,12 @@ class $$DeadLineDBTableAnnotationComposer
 
   GeneratedColumn<bool> get notified =>
       $composableBuilder(column: $table.notified, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
 class $$DeadLineDBTableTableManager
@@ -4513,6 +4639,8 @@ class $$DeadLineDBTableTableManager
                 Value<String> title = const Value.absent(),
                 Value<String> description = const Value.absent(),
                 Value<bool> notified = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
               }) => DeadLineDBCompanion(
                 id: id,
                 uuid: uuid,
@@ -4522,6 +4650,8 @@ class $$DeadLineDBTableTableManager
                 title: title,
                 description: description,
                 notified: notified,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
               ),
           createCompanionCallback:
               ({
@@ -4533,6 +4663,8 @@ class $$DeadLineDBTableTableManager
                 required String title,
                 required String description,
                 required bool notified,
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
               }) => DeadLineDBCompanion.insert(
                 id: id,
                 uuid: uuid,
@@ -4542,6 +4674,8 @@ class $$DeadLineDBTableTableManager
                 title: title,
                 description: description,
                 notified: notified,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

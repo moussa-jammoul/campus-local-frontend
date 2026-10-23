@@ -26,10 +26,11 @@ class WritingMedia extends Notifier<void> {
   ///second call: alreadyRead = 50, limit = 50 -> rows 51-100).
   Future<List<MediaForm>?> readData(
     String userUid,
-    String courseUuid,
+    String? courseUuid,
     int limit,
     int alreadyRead,
-    List<String>? fileextention
+    List<String>? fileextention,
+    bool isFav
   ) async {
     if (db != null) {
       logger.i(
@@ -39,25 +40,56 @@ class WritingMedia extends Notifier<void> {
         late List<MediaDBData> rawRows;
         if(fileextention != null){
           //get specific type of data = to file extention
+          if(courseUuid != null){
+            
          rawRows = await (db!.select(db!.mediaDB)
               ..where((t) =>
     t.userUid.equals(userUid) &
     t.courseUuid.equals(courseUuid) &
-    t.fileType.isIn(fileextention))
+    t.fileType.isIn(fileextention) &
+    (isFav ? t.isFavorite.equals(true) : const Constant(true)) //no fallback if no favorite
+    ) 
               ..orderBy([
                 (t) => OrderingTerm.desc(t.createdAt),
               ])
               ..limit(limit, offset: alreadyRead))
             .get();
+          } else{
+            //get data not scopped to a course
+              rawRows = await (db!.select(db!.mediaDB)
+              ..where((t) =>
+    t.userUid.equals(userUid) &
+    t.fileType.isIn(fileextention)&
+    (isFav ? t.isFavorite.equals(true) : const Constant(true)) //no fallback if no favorite
+    )
+              ..orderBy([
+                (t) => OrderingTerm.desc(t.createdAt),
+              ])
+              ..limit(limit, offset: alreadyRead))
+            .get();
+
+          }
         } else{
+          if(courseUuid != null){
           ///get all data if no file extention refered
           rawRows =  await (db!.select(db!.mediaDB)
-              ..where((t) => t.userUid.equals(userUid) & t.courseUuid.equals(courseUuid) )
+              ..where((t) => t.userUid.equals(userUid) & t.courseUuid.equals(courseUuid) & (isFav ? t.isFavorite.equals(true) : const Constant(true)) )
               ..orderBy([
                 (t) => OrderingTerm.desc(t.createdAt),
               ])
               ..limit(limit, offset: alreadyRead))
             .get();
+          } else{
+            //Get All data scopped to an account
+             rawRows =  await (db!.select(db!.mediaDB)
+              ..where((t) => t.userUid.equals(userUid) & (isFav ? t.isFavorite.equals(true) : const Constant(true))  )
+              ..orderBy([
+                (t) => OrderingTerm.desc(t.createdAt),
+              ])
+              ..limit(limit, offset: alreadyRead))
+            .get();
+
+          }
         }
 
         final media = rawRows.map((rawRow) {
