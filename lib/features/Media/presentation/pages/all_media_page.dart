@@ -16,7 +16,7 @@ import 'package:go_router/go_router.dart';
 
 
 
-//TODO add is Fav filter to all app bars
+
 
 
 
@@ -29,9 +29,7 @@ class AllMediaPage extends ConsumerStatefulWidget {
 
 class _AllMediaPageState extends ConsumerState<AllMediaPage> {
 
-  final allowedFormatVideo = ['mp4', 'mov', 'mkv', 'avi'];
-  final allowedFormatImage = ['jpg' , 'png'];
-  final allowedFileFormat = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'zip'];
+ 
 
   final _scrollController = ScrollController();
   bool _loadingMore = false;
@@ -205,10 +203,10 @@ class _AllMediaPageState extends ConsumerState<AllMediaPage> {
   ///this function is used to return a specific tile 
   ///depending on the type of the media
   Widget decideTile(MediaForm media){
-    if(allowedFileFormat.contains(media.filetype)){
+    if(mediaFileFormats.contains(media.filetype)){
       return FileTile(mediaItem: media ,  key: ValueKey(media.id));
     }
-    else if(allowedFormatImage.contains(media.filetype)){
+    else if(mediaImageFormats.contains(media.filetype)){
       return ImageTile(mediaItem: media,  key: ValueKey(media.id));
     } else{
       return VideoTile(mediaItem: media,  key: ValueKey(media.id));

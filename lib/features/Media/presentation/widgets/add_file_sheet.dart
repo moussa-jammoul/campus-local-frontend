@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/file_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services.dart';
 import 'package:path/path.dart' as p;   
@@ -65,7 +66,7 @@ class _AddFileBottomSheetContentState
   Future<void> _pickFile() async {
     final data = await ref
         .read(mediaServiceProvider.notifier)
-        .pickFile(allowedFileFormat);
+        .pickFile(mediaFileFormats);
 
     if (data != null && data.$1 != null) {
       setState(() {

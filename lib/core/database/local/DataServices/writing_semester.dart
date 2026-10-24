@@ -84,6 +84,8 @@ class WritingSemester extends Notifier<void> {
               semesterName: data.semesterName,
               description: data.description,
               finishedOrYet: data.finishedOrYet,
+              
+
             ),
           );
       logger.i('wrote semester successfully for userUid: ${data.userUid}');

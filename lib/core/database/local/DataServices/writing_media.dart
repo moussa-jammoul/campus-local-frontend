@@ -6,6 +6,19 @@ import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAn
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:logger/logger.dart';
 
+
+///this class is a quick helper that hold
+///a media uuid with its type
+class MediaUUIDandTYPE{
+  final String uuid;
+  final String type;
+
+  const MediaUUIDandTYPE({required this.type , required this.uuid});
+}
+
+
+
+
 class WritingMedia extends Notifier<void> {
   AppDatabase? db;
   late Logger logger;
@@ -143,7 +156,7 @@ class WritingMedia extends Notifier<void> {
     );
   }
 
-  Future<MediaForm> addData(MediaForm data) async {
+  Future<MediaForm> addData(MediaForm data , bool recievedFromCloudWithoutMedia) async {
     if (db != null) {
       logger.i('writing data locally: $data');
       try {
@@ -160,6 +173,8 @@ class WritingMedia extends Notifier<void> {
                 fileType: data.filetype,
                 fileSizeByte: data.filesizeByte,
                 isFavorite: Value(data.isFavorite),
+                mediaAvailableLocally: Value(recievedFromCloudWithoutMedia)
+
               ),
             );
         logger.i('wrote media successfully for courseUuid: ${data.courseUuid}');
@@ -237,6 +252,57 @@ class WritingMedia extends Notifier<void> {
       throw Error();
     }
   }
+
+  ///labeling that the media exist locally
+  Future<void> labelMediaAvailableLocallyTrue(int id) async{
+    if(db != null){
+      logger.i('labeling media as available locally: $id');
+      try{
+        await (db!.update(db!.mediaDB)..where((t) => t.id.equals(id))).write(
+          MediaDBCompanion(
+            mediaAvailableLocally: Value(true)
+          )
+        );
+
+        logger.i("labeled the media as existing succesfly");
+
+      } catch(e){
+        logger.e(e);
+        rethrow;
+      }
+
+
+    } else{
+      logger.e('db is null, cannot update media');
+      throw Error();
+    }
+
+  }
+  
+  ///used to filter media that does not exist locally 
+  Future<List<MediaUUIDandTYPE>?> returnAllUnvailableMedia() async{
+    if(db != null){
+      logger.i("fetching all unvailable media locally");
+      try{
+        final rows = await (db!.select(db!.mediaDB)..where((t)=>t.mediaAvailableLocally.equals(false))).get();
+        return rows.map((row){
+          return MediaUUIDandTYPE(type: row.fileType, uuid: row.uuid);
+        }).toList();
+      } catch(e){
+        logger.e(e);
+        return null;
+      }
+
+    } else{
+      logger.e('db is null, cannot update media');
+      return null;
+
+    }
+    
+
+  }
+
+
 
   Future<void> deleteData(int id) async {
     if (db != null) {

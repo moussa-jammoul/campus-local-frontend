@@ -16,9 +16,7 @@ import 'package:flutterfrontenduniprojectmanager/features/Media/service/lastSync
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services_domain.dart';
 
 class MediaServices extends Notifier<void> implements MediaServicesDomain {
-  final allowedFormatVideo = ['mp4', 'mov', 'mkv', 'avi'];
-  final allowedFormatImage = ['jpg' , 'png'];
-  final allowedFileFormat = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'zip'];
+  
 
   @override
   void build() {
@@ -64,7 +62,7 @@ class MediaServices extends Notifier<void> implements MediaServicesDomain {
   ///to bring them from the device where the data exist , yet this notification is only
   ///for notifying , device-to-device media sending still not exist in the current time 
 
-  await ref.read(mediaProvider.notifier).addListOfMedia(data);
+  await ref.read(mediaProvider.notifier).addListOfMedia(data , true);
 
   
   if(fromAVisiblePageToRenderData){
@@ -207,14 +205,14 @@ class MediaServices extends Notifier<void> implements MediaServicesDomain {
   //small helper so we return related type of media , used inside delete to load
   //a media with the same related type
   List<String> _returnRelatedMedia(String type){
-    if(allowedFileFormat.contains(type)){
-      return allowedFileFormat;
+    if(mediaFileFormats.contains(type)){
+      return mediaFileFormats;
     }
-    else if(allowedFormatVideo.contains(type)){
-      return allowedFormatVideo;
+    else if(mediaVideoFormats.contains(type)){
+      return mediaVideoFormats;
     }
     else{
-      return allowedFormatImage;
+      return mediaImageFormats;
     }
 
   }

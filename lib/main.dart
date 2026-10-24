@@ -10,8 +10,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 ///TODO missing in the app : 
+///push the commit to git hub
 ///device-to-device sending media 
-///place where all media exist for an account + favorite ones
 ///dead lines (add , delete) with its ui , page , small reference in the home page
 ///demo/tutorial inside the app itself  , user can choose when he download the app with what mode he enter ( tutorial or already know the app)
 

@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/form.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/add_video_sheet.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/favorite_filter.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/VideoService/media_video_service.dart';
@@ -20,7 +21,7 @@ class VideoAppBar extends ConsumerWidget {
  
 
   final Course courseDetails;
-  final allowedFormat = ['mp4', 'mov', 'mkv', 'avi'];
+  
   final Completer<void> _isAddingVideo = Completer<void>();
 
   
@@ -111,7 +112,7 @@ class VideoAppBar extends ConsumerWidget {
       actions: [
         FavoritesButton(
           courseUuid: courseDetails.uuid,
-          types: allowedFormat,
+          types: mediaVideoFormats,
         ),
         IconButton(
           icon: const Icon(Icons.add_rounded, size: 20),
@@ -125,7 +126,7 @@ class VideoAppBar extends ConsumerWidget {
             unawaited(
               ref
                   .read(mediaServiceProvider.notifier)
-                  .fetchCloudData(courseUuid:  courseDetails.uuid,fileextention:  allowedFormat),
+                  .fetchCloudData(courseUuid:  courseDetails.uuid,fileextention:  mediaVideoFormats),
             );
           },
           icon: const Icon(Icons.refresh),

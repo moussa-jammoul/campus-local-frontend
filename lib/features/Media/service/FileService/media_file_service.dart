@@ -18,7 +18,7 @@ import 'package:uuid/uuid.dart';
 class MediaFileService extends Notifier<void> implements MediaFileServiceDomain {
 
   late Logger logger;
-  final allowedFileFormat = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'zip'];
+  
 
   @override
   void build() {
@@ -64,8 +64,8 @@ class MediaFileService extends Notifier<void> implements MediaFileServiceDomain 
       isFavorite: isFavorite,
     );
 
-    final inserted = await ref.read(mediaProvider.notifier).addNewMedia(data);
-    await ref.read(mediaServiceProvider.notifier).refreshDataLocally(courseUuid, allowedFileFormat , false);
+    final inserted = await ref.read(mediaProvider.notifier).addNewMedia(data , false);
+    await ref.read(mediaServiceProvider.notifier).refreshDataLocally(courseUuid, mediaFileFormats , false);
     ///local-first architecture: we don't wait on the cloud push here,
     ///it will keep retrying until connection resolves
     unawaited(

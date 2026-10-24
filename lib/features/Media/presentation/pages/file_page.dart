@@ -14,7 +14,6 @@ import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_se
 import 'package:open_filex/open_filex.dart';
 
 
-const allowedFileFormat = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'zip'];
 
 class FilePage extends ConsumerStatefulWidget {
   const FilePage({super.key, required this.courseData});
@@ -34,7 +33,7 @@ class _FilePageState extends ConsumerState<FilePage> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    ref.read(mediaServiceProvider.notifier).readData(widget.courseData.uuid!, allowedFileFormat);
+    ref.read(mediaServiceProvider.notifier).readData(widget.courseData.uuid!, mediaFileFormats);
   }
 
   @override
@@ -59,7 +58,7 @@ class _FilePageState extends ConsumerState<FilePage> {
 
       await ref
           .read(mediaServiceProvider.notifier)
-          .readData(widget.courseData.uuid!, allowedFileFormat);
+          .readData(widget.courseData.uuid!, mediaFileFormats);
 
       if (!mounted) return;
       final after = ref.read(mediaProvider)?.length ?? 0;

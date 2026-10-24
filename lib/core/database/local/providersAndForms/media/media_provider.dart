@@ -93,10 +93,10 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
   
 
   ///used for adding a single media
-  Future<MediaForm> addNewMedia( MediaForm media) async {
+  Future<MediaForm> addNewMedia(MediaForm media , bool recievedFromCloudWithoutMedia) async {
     logger.i('adding new media for the course : ${media.courseUuid}');
     try {
-      final inserted = await ref.read(writeMediaProvider.notifier).addData(media);
+      final inserted = await ref.read(writeMediaProvider.notifier).addData(media , recievedFromCloudWithoutMedia);
 
       ///here , we can't assume that the user still in the page to actually render the new media
       ///because we are here after an asyn , so we can make a quick check by using the current position
@@ -128,7 +128,7 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
   ///because rebuilding the state list each time until we end (because state is immutable) , here we just call directly 
   ///state = [...state , ...list] , one rebuild , note that add list media don't touch state , so to update the state
   ///we should call reset media state first , then loading paginated data
-  Future<void> addListOfMedia(List<MediaForm> data) async{
+  Future<void> addListOfMedia(List<MediaForm> data , bool recievedFromCloudWithoutMedia) async{
     logger.i('adding list of media for the course');
     try{
       List<MediaForm> insertedData = [];
@@ -141,7 +141,7 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
           ///already exist locally, so it is an update (not added to insertedData)
           await updateMedia(media);
         } else {
-          final inserted = await ref.read(writeMediaProvider.notifier).addData(media);
+          final inserted = await ref.read(writeMediaProvider.notifier).addData(media , recievedFromCloudWithoutMedia);
           insertedData.add(inserted);
         }
       }

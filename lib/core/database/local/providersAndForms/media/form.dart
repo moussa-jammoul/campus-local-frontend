@@ -1,5 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+
+///format 
+const mediaImageFormats = ['png' , 'jpg'];
+const mediaVideoFormats = ['mp4', 'mov', 'mkv', 'avi'];
+const mediaFileFormats = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'zip'];
+
+
 class MediaForm {
   final int? id; //auto generated in the db
   final String? uuid; //auto generated inside the sql db

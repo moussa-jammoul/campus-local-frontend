@@ -21,7 +21,7 @@ import 'package:uuid/uuid.dart';
 
 class MediaImageService extends Notifier<void> implements MediaImageServiceDomain {
   late Logger logger;
-  final allowedImage = ['png' , 'jpg'];
+  
 
   @override
   void build() {
@@ -71,10 +71,10 @@ Future<void> addMedia({
       isFavorite: isFavorite,
     );
 
-    final inserted = await ref.read(mediaProvider.notifier).addNewMedia(data);
+    final inserted = await ref.read(mediaProvider.notifier).addNewMedia(data , false);
      
      //refreshing state
-    await ref.read(mediaServiceProvider.notifier).refreshDataLocally(courseUuid, allowedImage , false);
+    await ref.read(mediaServiceProvider.notifier).refreshDataLocally(courseUuid, mediaImageFormats , false);
 
 
     ///local-first architecture: we don't wait on the cloud push here,

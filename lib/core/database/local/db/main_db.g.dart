@@ -2735,6 +2735,21 @@ class $MediaDBTable extends MediaDB with TableInfo<$MediaDBTable, MediaDBData> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _mediaAvailableLocallyMeta =
+      const VerificationMeta('mediaAvailableLocally');
+  @override
+  late final GeneratedColumn<bool> mediaAvailableLocally =
+      GeneratedColumn<bool>(
+        'media_available_locally',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("media_available_locally" IN (0, 1))',
+        ),
+        defaultValue: const Constant(true),
+      );
   static const VerificationMeta _isFavoriteMeta = const VerificationMeta(
     'isFavorite',
   );
@@ -2785,6 +2800,7 @@ class $MediaDBTable extends MediaDB with TableInfo<$MediaDBTable, MediaDBData> {
     filePath,
     fileType,
     fileSizeByte,
+    mediaAvailableLocally,
     isFavorite,
     createdAt,
     updatedAt,
@@ -2870,6 +2886,15 @@ class $MediaDBTable extends MediaDB with TableInfo<$MediaDBTable, MediaDBData> {
     } else if (isInserting) {
       context.missing(_fileSizeByteMeta);
     }
+    if (data.containsKey('media_available_locally')) {
+      context.handle(
+        _mediaAvailableLocallyMeta,
+        mediaAvailableLocally.isAcceptableOrUnknown(
+          data['media_available_locally']!,
+          _mediaAvailableLocallyMeta,
+        ),
+      );
+    }
     if (data.containsKey('is_favorite')) {
       context.handle(
         _isFavoriteMeta,
@@ -2933,6 +2958,10 @@ class $MediaDBTable extends MediaDB with TableInfo<$MediaDBTable, MediaDBData> {
         DriftSqlType.int,
         data['${effectivePrefix}file_size_byte'],
       )!,
+      mediaAvailableLocally: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}media_available_locally'],
+      )!,
       isFavorite: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_favorite'],
@@ -2964,6 +2993,7 @@ class MediaDBData extends DataClass implements Insertable<MediaDBData> {
   final String filePath;
   final String fileType;
   final int fileSizeByte;
+  final bool mediaAvailableLocally;
   final bool isFavorite;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -2977,6 +3007,7 @@ class MediaDBData extends DataClass implements Insertable<MediaDBData> {
     required this.filePath,
     required this.fileType,
     required this.fileSizeByte,
+    required this.mediaAvailableLocally,
     required this.isFavorite,
     required this.createdAt,
     required this.updatedAt,
@@ -2995,6 +3026,7 @@ class MediaDBData extends DataClass implements Insertable<MediaDBData> {
     map['file_path'] = Variable<String>(filePath);
     map['file_type'] = Variable<String>(fileType);
     map['file_size_byte'] = Variable<int>(fileSizeByte);
+    map['media_available_locally'] = Variable<bool>(mediaAvailableLocally);
     map['is_favorite'] = Variable<bool>(isFavorite);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -3014,6 +3046,7 @@ class MediaDBData extends DataClass implements Insertable<MediaDBData> {
       filePath: Value(filePath),
       fileType: Value(fileType),
       fileSizeByte: Value(fileSizeByte),
+      mediaAvailableLocally: Value(mediaAvailableLocally),
       isFavorite: Value(isFavorite),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -3035,6 +3068,9 @@ class MediaDBData extends DataClass implements Insertable<MediaDBData> {
       filePath: serializer.fromJson<String>(json['filePath']),
       fileType: serializer.fromJson<String>(json['fileType']),
       fileSizeByte: serializer.fromJson<int>(json['fileSizeByte']),
+      mediaAvailableLocally: serializer.fromJson<bool>(
+        json['mediaAvailableLocally'],
+      ),
       isFavorite: serializer.fromJson<bool>(json['isFavorite']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -3053,6 +3089,7 @@ class MediaDBData extends DataClass implements Insertable<MediaDBData> {
       'filePath': serializer.toJson<String>(filePath),
       'fileType': serializer.toJson<String>(fileType),
       'fileSizeByte': serializer.toJson<int>(fileSizeByte),
+      'mediaAvailableLocally': serializer.toJson<bool>(mediaAvailableLocally),
       'isFavorite': serializer.toJson<bool>(isFavorite),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -3069,6 +3106,7 @@ class MediaDBData extends DataClass implements Insertable<MediaDBData> {
     String? filePath,
     String? fileType,
     int? fileSizeByte,
+    bool? mediaAvailableLocally,
     bool? isFavorite,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -3084,6 +3122,7 @@ class MediaDBData extends DataClass implements Insertable<MediaDBData> {
     filePath: filePath ?? this.filePath,
     fileType: fileType ?? this.fileType,
     fileSizeByte: fileSizeByte ?? this.fileSizeByte,
+    mediaAvailableLocally: mediaAvailableLocally ?? this.mediaAvailableLocally,
     isFavorite: isFavorite ?? this.isFavorite,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -3105,6 +3144,9 @@ class MediaDBData extends DataClass implements Insertable<MediaDBData> {
       fileSizeByte: data.fileSizeByte.present
           ? data.fileSizeByte.value
           : this.fileSizeByte,
+      mediaAvailableLocally: data.mediaAvailableLocally.present
+          ? data.mediaAvailableLocally.value
+          : this.mediaAvailableLocally,
       isFavorite: data.isFavorite.present
           ? data.isFavorite.value
           : this.isFavorite,
@@ -3125,6 +3167,7 @@ class MediaDBData extends DataClass implements Insertable<MediaDBData> {
           ..write('filePath: $filePath, ')
           ..write('fileType: $fileType, ')
           ..write('fileSizeByte: $fileSizeByte, ')
+          ..write('mediaAvailableLocally: $mediaAvailableLocally, ')
           ..write('isFavorite: $isFavorite, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -3143,6 +3186,7 @@ class MediaDBData extends DataClass implements Insertable<MediaDBData> {
     filePath,
     fileType,
     fileSizeByte,
+    mediaAvailableLocally,
     isFavorite,
     createdAt,
     updatedAt,
@@ -3160,6 +3204,7 @@ class MediaDBData extends DataClass implements Insertable<MediaDBData> {
           other.filePath == this.filePath &&
           other.fileType == this.fileType &&
           other.fileSizeByte == this.fileSizeByte &&
+          other.mediaAvailableLocally == this.mediaAvailableLocally &&
           other.isFavorite == this.isFavorite &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -3175,6 +3220,7 @@ class MediaDBCompanion extends UpdateCompanion<MediaDBData> {
   final Value<String> filePath;
   final Value<String> fileType;
   final Value<int> fileSizeByte;
+  final Value<bool> mediaAvailableLocally;
   final Value<bool> isFavorite;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
@@ -3188,6 +3234,7 @@ class MediaDBCompanion extends UpdateCompanion<MediaDBData> {
     this.filePath = const Value.absent(),
     this.fileType = const Value.absent(),
     this.fileSizeByte = const Value.absent(),
+    this.mediaAvailableLocally = const Value.absent(),
     this.isFavorite = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -3202,6 +3249,7 @@ class MediaDBCompanion extends UpdateCompanion<MediaDBData> {
     required String filePath,
     required String fileType,
     required int fileSizeByte,
+    this.mediaAvailableLocally = const Value.absent(),
     this.isFavorite = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -3221,6 +3269,7 @@ class MediaDBCompanion extends UpdateCompanion<MediaDBData> {
     Expression<String>? filePath,
     Expression<String>? fileType,
     Expression<int>? fileSizeByte,
+    Expression<bool>? mediaAvailableLocally,
     Expression<bool>? isFavorite,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -3235,6 +3284,8 @@ class MediaDBCompanion extends UpdateCompanion<MediaDBData> {
       if (filePath != null) 'file_path': filePath,
       if (fileType != null) 'file_type': fileType,
       if (fileSizeByte != null) 'file_size_byte': fileSizeByte,
+      if (mediaAvailableLocally != null)
+        'media_available_locally': mediaAvailableLocally,
       if (isFavorite != null) 'is_favorite': isFavorite,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -3251,6 +3302,7 @@ class MediaDBCompanion extends UpdateCompanion<MediaDBData> {
     Value<String>? filePath,
     Value<String>? fileType,
     Value<int>? fileSizeByte,
+    Value<bool>? mediaAvailableLocally,
     Value<bool>? isFavorite,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
@@ -3265,6 +3317,8 @@ class MediaDBCompanion extends UpdateCompanion<MediaDBData> {
       filePath: filePath ?? this.filePath,
       fileType: fileType ?? this.fileType,
       fileSizeByte: fileSizeByte ?? this.fileSizeByte,
+      mediaAvailableLocally:
+          mediaAvailableLocally ?? this.mediaAvailableLocally,
       isFavorite: isFavorite ?? this.isFavorite,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -3301,6 +3355,11 @@ class MediaDBCompanion extends UpdateCompanion<MediaDBData> {
     if (fileSizeByte.present) {
       map['file_size_byte'] = Variable<int>(fileSizeByte.value);
     }
+    if (mediaAvailableLocally.present) {
+      map['media_available_locally'] = Variable<bool>(
+        mediaAvailableLocally.value,
+      );
+    }
     if (isFavorite.present) {
       map['is_favorite'] = Variable<bool>(isFavorite.value);
     }
@@ -3325,6 +3384,7 @@ class MediaDBCompanion extends UpdateCompanion<MediaDBData> {
           ..write('filePath: $filePath, ')
           ..write('fileType: $fileType, ')
           ..write('fileSizeByte: $fileSizeByte, ')
+          ..write('mediaAvailableLocally: $mediaAvailableLocally, ')
           ..write('isFavorite: $isFavorite, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -4713,6 +4773,7 @@ typedef $$MediaDBTableCreateCompanionBuilder =
       required String filePath,
       required String fileType,
       required int fileSizeByte,
+      Value<bool> mediaAvailableLocally,
       Value<bool> isFavorite,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -4728,6 +4789,7 @@ typedef $$MediaDBTableUpdateCompanionBuilder =
       Value<String> filePath,
       Value<String> fileType,
       Value<int> fileSizeByte,
+      Value<bool> mediaAvailableLocally,
       Value<bool> isFavorite,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -4784,6 +4846,11 @@ class $$MediaDBTableFilterComposer
 
   ColumnFilters<int> get fileSizeByte => $composableBuilder(
     column: $table.fileSizeByte,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get mediaAvailableLocally => $composableBuilder(
+    column: $table.mediaAvailableLocally,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4857,6 +4924,11 @@ class $$MediaDBTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get mediaAvailableLocally => $composableBuilder(
+    column: $table.mediaAvailableLocally,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isFavorite => $composableBuilder(
     column: $table.isFavorite,
     builder: (column) => ColumnOrderings(column),
@@ -4915,6 +4987,11 @@ class $$MediaDBTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<bool> get mediaAvailableLocally => $composableBuilder(
+    column: $table.mediaAvailableLocally,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<bool> get isFavorite => $composableBuilder(
     column: $table.isFavorite,
     builder: (column) => column,
@@ -4967,6 +5044,7 @@ class $$MediaDBTableTableManager
                 Value<String> filePath = const Value.absent(),
                 Value<String> fileType = const Value.absent(),
                 Value<int> fileSizeByte = const Value.absent(),
+                Value<bool> mediaAvailableLocally = const Value.absent(),
                 Value<bool> isFavorite = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -4980,6 +5058,7 @@ class $$MediaDBTableTableManager
                 filePath: filePath,
                 fileType: fileType,
                 fileSizeByte: fileSizeByte,
+                mediaAvailableLocally: mediaAvailableLocally,
                 isFavorite: isFavorite,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -4995,6 +5074,7 @@ class $$MediaDBTableTableManager
                 required String filePath,
                 required String fileType,
                 required int fileSizeByte,
+                Value<bool> mediaAvailableLocally = const Value.absent(),
                 Value<bool> isFavorite = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -5008,6 +5088,7 @@ class $$MediaDBTableTableManager
                 filePath: filePath,
                 fileType: fileType,
                 fileSizeByte: fileSizeByte,
+                mediaAvailableLocally: mediaAvailableLocally,
                 isFavorite: isFavorite,
                 createdAt: createdAt,
                 updatedAt: updatedAt,

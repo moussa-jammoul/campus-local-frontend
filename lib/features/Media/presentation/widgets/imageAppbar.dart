@@ -75,7 +75,7 @@ class ImageAppBar extends ConsumerWidget {
       actions: [
         FavoritesButton(
           courseUuid: courseDetails.uuid,
-          types: ['png' , 'jpg'],
+          types: mediaImageFormats,
         ),
         IconButton(
           icon: const Icon(Icons.add_rounded, size: 20),
@@ -87,7 +87,7 @@ class ImageAppBar extends ConsumerWidget {
         IconButton(
           onPressed: (){
             unawaited(
-            ref.read(mediaServiceProvider.notifier).fetchCloudData(courseUuid:  courseDetails.uuid, fileextention: ['jpg' , 'png'])
+            ref.read(mediaServiceProvider.notifier).fetchCloudData(courseUuid:  courseDetails.uuid, fileextention:mediaImageFormats )
             );
           }, 
           icon: Icon(

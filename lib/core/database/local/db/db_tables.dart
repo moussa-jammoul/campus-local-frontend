@@ -131,8 +131,16 @@ class MediaDB extends Table {
   TextColumn get fileType => text()();
   IntColumn get fileSizeByte => integer()();
 
+  //this column right here neither exist in the local state or cloud , only in the local db
+  //used  to read all uuid of media that does not exist locally  , the default value is "true"
+  //meaning that we  add the media directly from the device , when we recieve media from cloud
+  //we override it with false
+  BoolColumn get mediaAvailableLocally => boolean().withDefault(const Constant(true))();
+
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
 
   DateTimeColumn get createdAt => dateTime().clientDefault(() => DateTime.now())();
   DateTimeColumn get updatedAt => dateTime().clientDefault(() => DateTime.now())();
 }
+
+

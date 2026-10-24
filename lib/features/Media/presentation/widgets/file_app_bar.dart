@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/form.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/file_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/add_file_sheet.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/widgets/favorite_filter.dart';
@@ -72,7 +73,7 @@ class FileAppBar extends ConsumerWidget {
       actions: [
         FavoritesButton(
           courseUuid: courseDetails.uuid,
-          types:allowedFileFormat ,
+          types:mediaFileFormats ,
         ),
         IconButton(
           icon: const Icon(Icons.add_rounded, size: 20),
@@ -86,7 +87,7 @@ class FileAppBar extends ConsumerWidget {
             unawaited(
               ref
                   .read(mediaServiceProvider.notifier)
-                  .fetchCloudData(courseUuid:  courseDetails.uuid,fileextention:  allowedFileFormat),
+                  .fetchCloudData(courseUuid:  courseDetails.uuid,fileextention:  mediaFileFormats),
             );
           },
           icon: const Icon(Icons.refresh),

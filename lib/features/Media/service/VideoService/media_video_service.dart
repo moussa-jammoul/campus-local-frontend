@@ -19,7 +19,7 @@ import 'package:logger/web.dart';
 import 'package:uuid/uuid.dart';
 
 class MediaVideoService extends Notifier<void> implements MediaVideoServicesDomain {
-  final allowedFormatVideo = ['mp4', 'mov', 'mkv', 'avi'];
+  
   late Logger logger;
  
   @override
@@ -105,8 +105,8 @@ class MediaVideoService extends Notifier<void> implements MediaVideoServicesDoma
       isFavorite: isFavorite,
     );
 
-    final inserted = await ref.read(mediaProvider.notifier).addNewMedia(data);
-    await ref.read(mediaServiceProvider.notifier).refreshDataLocally(courseUuid, allowedFormatVideo , false);
+    final inserted = await ref.read(mediaProvider.notifier).addNewMedia(data , false);
+    await ref.read(mediaServiceProvider.notifier).refreshDataLocally(courseUuid, mediaVideoFormats , false);
     ///local-first architecture: we don't wait on the cloud push here,
     ///it will keep retrying until connection resolves
     unawaited(
