@@ -45,7 +45,8 @@ class OpenConnectionToSendMedia extends ConsumerWidget {
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
             onTap: () {
-              // TODO: open secure connection via mDNS
+              //TODO open connection
+              
             },
             child: Ink(
               decoration: BoxDecoration(

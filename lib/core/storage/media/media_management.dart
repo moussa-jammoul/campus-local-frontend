@@ -29,6 +29,19 @@ class MediaManagment extends Notifier<void> {
     final appDocDir = await getApplicationDocumentsDirectory();
     return File(p.join(appDocDir.path, relativePath));
   }
+  
+  
+
+  Future<File?> returnFileByRelativePath({
+    required String relativepath
+  }) async{
+    final file = await _resolveMediaFile(relativepath);
+    if(await file.exists()){
+      return file;
+    }
+    return null;
+  }
+
 
   Future<SavedMediaFileInfo> saveMediaFile({
     required String sourcePath,     

@@ -1,0 +1,110 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    match /users/{userId}/courses/{courseId} {
+  allow read, delete: if isOwner(userId);
+  allow create, update: if isOwner(userId)
+    && request.resource.data.keys().hasOnly(['user_uid', 'course_name', 'description', 'professor_name', 'semester_uuid', 'created_at', 'updated_at'])
+    && request.resource.data.user_uid == userId
+    && request.resource.data.course_name is string
+    && request.resource.data.course_name.size() > 0
+    && request.resource.data.course_name.size() < 100
+    && request.resource.data.description is string
+    && request.resource.data.description.size() < 2000
+    && request.resource.data.professor_name is string
+    && request.resource.data.semester_uuid is string
+    && request.resource.data.created_at is timestamp
+    && request.resource.data.updated_at is timestamp;
+}
+
+    match /users/{userId}/deadlines/{deadlineId} {
+      allow read, delete: if isOwner(userId);
+      allow create, update: if isOwner(userId)
+        && request.resource.data.keys().hasOnly(['title', 'description', 'due_at', 'media_id', 'notified'])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() < 200
+        && request.resource.data.description is string
+        && request.resource.data.description.size() < 2000
+        && request.resource.data.due_at is timestamp
+        && request.resource.data.media_id is int
+        && request.resource.data.notified is bool;
+    }
+
+    match /users/{userId}/media/{mediaId} {
+  allow read, delete: if isOwner(userId);
+
+  allow create, update: if isOwner(userId)
+    && request.resource.data.keys().hasOnly([
+         'user_uid', 'course_uuid', 'filename', 'file_description',
+         'filepath', 'filetype', 'filesize_byte', 'is_favorite',
+         'created_at', 'updated_at'
+       ])
+    && request.resource.data.user_uid == userId
+    && request.resource.data.course_uuid is string
+    && request.resource.data.filename is string
+    && request.resource.data.filename.size() > 0
+    && (request.resource.data.file_description == null
+        || request.resource.data.file_description is string)
+    && request.resource.data.filepath is string
+    && request.resource.data.filetype is string
+    && request.resource.data.filesize_byte is int
+    && request.resource.data.filesize_byte > 0
+    && request.resource.data.is_favorite is bool
+    && request.resource.data.created_at is timestamp
+    && request.resource.data.updated_at is timestamp;
+}
+
+   match /users/{userId}/semesters/{semesterId} {
+  allow read, delete: if isOwner(userId);
+  allow create, update: if isOwner(userId)
+    && request.resource.data.keys().hasOnly([
+         'user_uid', 'semester_name', 'description', 'finished_or_yet', 'created_at', 'updated_at'
+       ])
+    && request.resource.data.user_uid == userId
+    && request.resource.data.semester_name is string
+    && request.resource.data.semester_name.size() > 0
+    && request.resource.data.description is string
+    && request.resource.data.finished_or_yet is bool
+    && request.resource.data.created_at is timestamp
+    && request.resource.data.updated_at is timestamp;
+}
+
+    match /users/{userId}/useritems/devicetokens/devices/{deviceId} {
+  allow read, delete: if isOwner(userId);
+  allow create, update: if isOwner(userId)
+    && request.resource.data.keys().hasOnly(['user_uid', 'notification_token', 'device_name', 'created_at', 'updated_at'])
+    && request.resource.data.user_uid is string
+    && request.resource.data.user_uid == userId
+    && (request.resource.data.notification_token is string || request.resource.data.notification_token == null)
+    && (request.resource.data.notification_token == null || request.resource.data.notification_token.size() > 0)
+    && request.resource.data.device_name is string
+    && request.resource.data.created_at is timestamp
+    && request.resource.data.updated_at is timestamp;
+}
+
+    match /users/{userId}/useritems/userdata {
+      allow read, delete: if isOwner(userId);
+      allow create, update: if isOwner(userId)
+        && request.resource.data.keys().hasOnly(['created_at', 'date_of_birth', 'email', 'fullname', 'major', 'role', 'updated_at'])
+        && request.resource.data.fullname is string
+        && request.resource.data.fullname.size() > 0
+        && request.resource.data.fullname.size() < 100
+        && request.resource.data.email is string
+        && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+        && request.resource.data.major is string
+        && request.resource.data.role in ['student', 'professor']
+        && request.resource.data.date_of_birth is string
+        && request.resource.data.updated_at is timestamp;
+    }
+  }
+}

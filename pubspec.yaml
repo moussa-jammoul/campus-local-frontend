@@ -58,6 +58,11 @@ dependencies:
   video_player: ^2.14.1
   open_filex: ^5.0.0
   flutter_secure_storage: ^11.2.0
+  crypto: ^3.0.7
+  basic_utils: ^5.8.2
+  nsd: ^5.0.1
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^7.4.2
 
 dev_dependencies:
   flutter_test:

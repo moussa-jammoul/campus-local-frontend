@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_media.dart';
@@ -154,6 +156,18 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
       rethrow;
     }
   }
+  
+
+  //return raw file for a media using its uuid
+  Future<File?> returnRawFile(String uuid) async{
+    final media = await ref.read(writeMediaProvider.notifier).findByUuid(uuid);
+    if(media == null){
+      return null;
+    }
+    return await ref.read(mediaManagmentProvider.notifier).returnFileByRelativePath(relativepath: media.filepath);
+  } 
+
+
 }
 
 
