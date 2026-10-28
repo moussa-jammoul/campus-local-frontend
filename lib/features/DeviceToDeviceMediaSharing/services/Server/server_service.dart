@@ -12,15 +12,20 @@ import 'package:flutterfrontenduniprojectmanager/core/SecureStorage/SecureStorag
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/device_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/media_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/number_files_left.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/qrcode.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/Server/server_service_domain.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/Server/timer_helper.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/constants.dart';
 import 'package:logger/logger.dart';
 import 'package:nsd/nsd.dart';
 
-
+///right now the project doesn't really need to split between the server set up and the device to device sending media (handlers) ,
+///whenever the project require this , we can move the set up to "core" and left the extra steps and handlers here.
 
 class ServerService extends Notifier<void> implements ServerServiceDomain {
+
+  
 
   late Logger logger;
   HttpServer? _server;
@@ -52,7 +57,7 @@ Future<int?> bindAndOpenHTTPSCONNECTION({
      server.listen(
       (req)=>_handleRequest(req, token),
       onError: (e) => logger.e('server error: $e'),
-      onDone: () => logger.i('working on a request') ,
+      onDone: () => logger.i('Server closed !') ,
      );
       _server = server;
       logger.i('HTTPS server listening on port ${server.port}');
@@ -63,10 +68,16 @@ Future<int?> bindAndOpenHTTPSCONNECTION({
     return null;
   }
 }
-//TODO : read the header which mention the number of file needed , we store it locally , we keep decreasing it on each request , when it is zero , we end the server
-//TODO : we run a timer between two idle time of requests , when it exceed the number , we stop the process , it mean we lost the connection from the receiver side
+//how to stop the process ? two case :1- read the header which mention the number of file needed , we store it locally , we keep decreasing it on each request , when it is zero , we end the server
+//2- we run a timer between two idle time of requests , when it exceed the timer , we stop the process , it mean we lost the connection from the receiver side
+
+
+static const _firstScanSeconds = 2000; // waiting for the QR scan
+static const _idleSeconds = 2000;      // gap between two requests
+
 Future<void> _handleRequest(HttpRequest req , String token) async{
   try{
+    
     logger.i('_handleRequest: ${req.method} ${req.uri.path} from ${req.connectionInfo?.remoteAddress.address}');
     //validating the token
     final tokenFromReq = req.headers.value('x-token');
@@ -80,16 +91,62 @@ Future<void> _handleRequest(HttpRequest req , String token) async{
     }
     logger.i('_handleRequest: token valid');
 
-  final segments = req.uri.pathSegments;
+  
+    if(ref.read(filesLeftProvider) == null){
+      final headerNbFile = req.headers.value('x-files-number');
+      if(headerNbFile == null){
+         logger.i('_handleRequest: missing number of files , rejecting the request...');
+         req.response.statusCode = HttpStatus.badRequest;
+         await req.response.close();
+         return;
+      }
+      final resultNBFILES = int.tryParse(headerNbFile);
+      
+      if(resultNBFILES == null || resultNBFILES <= 0){
+        logger.i('_handleRequest: bad request');
+         req.response.statusCode = HttpStatus.badRequest;
+         await req.response.close();
+         return;
+      }
+      ref.read(filesLeftProvider.notifier).setTotal(resultNBFILES);
+    }
+
+  final segments = req.uri.pathSegments;//something like /files/uuid of the media
   if (req.method == 'GET' && segments.length == 2 && segments[0] == 'files') {
-    logger.i('_handleRequest: file request for uuid ${segments[1]}');
-    await _sendFile(req, segments[1]);
-    logger.i('_handleRequest: file request finished for uuid ${segments[1]}');
+    
+    
+    ref.read(timerHelperProvider.notifier).stopTimer(); 
+    
+   
+    try{
+      logger.i('_handleRequest: file request for uuid ${segments[1]}');
+      await _sendFile(req, segments[1]);
+      logger.i('_handleRequest: file request finished for uuid ${segments[1]}');
+    } finally {
+      //success or failure the requester will not ask again for this file , until the user re-run the process
+      final left = ref.read(filesLeftProvider.notifier).decrement();
+      logger.i('_handleRequest: files left = $left');
+
+      if(left != null && left <= 0){
+       
+        await Future.delayed(const Duration(seconds: 1)); //small gap , so the receiver finish reading and storing , so they feel that both finish the job at the same time 
+        await stopProcess();
+      } else {
+        //start the timer to cover the gap time
+        ref.read(timerHelperProvider.notifier).startTimer(stopProcess, seconds: _idleSeconds);
+      }
+    }
     return;
   }
 
+  //if validating the method and segments failed :
+  logger.i('_handleRequest: unknown route, answering 404');
+  req.response.statusCode = HttpStatus.notFound;
+  await req.response.close();
+
   } catch(e){
     logger.e(e);
+    
     try {
     logger.i('_handleRequest: error happened, answering 500');
     req.response.statusCode = HttpStatus.internalServerError;
@@ -125,9 +182,9 @@ String extractFingerPrintFromCertificate({
   required String cert
 }) {
   logger.i('extractFingerPrintFromCertificate: converting PEM to DER bytes');
-  final der = CryptoUtils.getBytesFromPEMString(cert); // to byte
+  final der = CryptoUtils.getBytesFromPEMString(cert); 
   logger.i('extractFingerPrintFromCertificate: DER length ${der.length} bytes, hashing');
-  final fingerprint = sha256.convert(der).toString(); //hashing it
+  final fingerprint = sha256.convert(der).toString(); 
   logger.i('extractFingerPrintFromCertificate: fingerprint $fingerprint');
   return fingerprint;
 }
@@ -140,6 +197,7 @@ const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 final rng = Random.secure();
 final token = List.generate(length, (_) => chars[rng.nextInt(chars.length)]).join();
 logger.i('generateOneTimeToken: token generated');
+
 return token;
   } catch(e){ //possible if the current platform does not support cryptographically secure source
     logger.e(e);
@@ -206,7 +264,7 @@ void generateQrCodePayLoad({
   }
 
 
-  static final  serviceType = '_devicetodeviceshare._tcp'; 
+  
   Registration? _registration;
 
   @override
@@ -223,6 +281,7 @@ void generateQrCodePayLoad({
         'v': utf8.encode(protocolVersionMDNS.toString()),
       },
     );
+    
 
     _registration = await register(service);
     logger.i('sendMDNS: registered as ${_registration!.service.name}');
@@ -290,11 +349,20 @@ void generateQrCodePayLoad({
     fingerPrint: extractFingerPrintFromCertificate(cert: identity.certPem),  //extracting finger print from the certificate
     token: token
    );
+
+   
+   ref.read(timerHelperProvider.notifier).startTimer(stopProcess, seconds: _firstScanSeconds);
+   final interfaces = await NetworkInterface.list(type: InternetAddressType.IPv4);
+for (final i in interfaces) {
+  for (final a in i.addresses) {
+    logger.i('DEBUG interface ${i.name}: ${a.address}');
+  }
+}
+    logger.i("data :$port , $token ");//TODO remember to delete
   
     } catch(e){
       logger.e(e);
       await stopProcess();
-      
       rethrow;
     }
   }
@@ -332,6 +400,12 @@ void generateQrCodePayLoad({
   @override
   Future<void> stopProcess() async {
     try{
+      
+      ref.read(timerHelperProvider.notifier).stopTimer();
+      
+      ref.read(filesLeftProvider.notifier).reset();
+     
+      ref.read(qrCodeDataProvider.notifier).clear();
     await stopMdns();
     await stopServer();
     }catch(e){
@@ -345,3 +419,8 @@ void generateQrCodePayLoad({
 
 
 }
+
+
+final serverServicerProvider = NotifierProvider<ServerService,void>((){
+  return ServerService();
+});

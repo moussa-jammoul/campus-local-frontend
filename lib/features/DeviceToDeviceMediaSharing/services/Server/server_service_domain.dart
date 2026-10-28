@@ -1,8 +1,8 @@
 import 'package:flutterfrontenduniprojectmanager/core/SecureStorage/SecureStorageServices/LocalServer/form.dart';
 
 
-///right now the project doesn't really need to split between the server set up and the device to device sending media ,
-///whenever the project require this , we can move the set up to "core" and left the extra steps and handlers here
+///right now the project doesn't really need to split between the server set up and the device to device sending media (handlers) ,
+///whenever the project require this , we can move the set up to "core" and left the extra steps and handlers here.
 
 abstract class ServerServiceDomain {
   Future<void> generateIdentityAndStoreIt(String devicename);//generate a secret key and a certificate for the https protocol
@@ -36,7 +36,7 @@ abstract class ServerServiceDomain {
   
   Future<void> stopMdns();
   Future<void> stopServer();
-
+  
   Future<void> startProcess();
   Future<void> stopProcess();// unregister mDNS , clear state  , stop the connection...
 

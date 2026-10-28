@@ -58,9 +58,7 @@ class MediaServices extends Notifier<void> implements MediaServicesDomain {
     return;
   }
 
-  ///TODO : if data have some media their , we should notifiy the user with an overlay
-  ///to bring them from the device where the data exist , yet this notification is only
-  ///for notifying , device-to-device media sending still not exist in the current time 
+  ///TODO : Show overlay to grab media via device to device media sender
 
   await ref.read(mediaProvider.notifier).addListOfMedia(data , true);
 

@@ -11,6 +11,8 @@ import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAn
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/semester_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/widgets/qr_code_sheet.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/Server/server_service.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/service/home_page_services_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/data/login_api_firebase.dart';
 import 'package:logger/logger.dart';
@@ -109,6 +111,13 @@ Future<void> refreshLinkedDevices() async {
       rethrow;
     }
     
+  }
+
+  @override
+  Future<void> openSecureServerConnection() async {
+    logger.i("starting the server process...");
+    await ref.read(serverServicerProvider.notifier).startProcess();
+    QrCodeSheet.show();
   }
 
 }

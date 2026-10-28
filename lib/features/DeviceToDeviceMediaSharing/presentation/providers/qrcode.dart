@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
+
+
+
 //hold a json , we use it to generate the qr code
 class QrcodeData extends Notifier<String?> {
   @override
@@ -12,7 +15,7 @@ class QrcodeData extends Notifier<String?> {
     state = json;
   }
 
-  void resetData(){
+  void clear(){
     state = null;
   }
 
