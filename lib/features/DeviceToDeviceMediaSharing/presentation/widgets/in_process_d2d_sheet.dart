@@ -2,8 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/timer_helper.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/current_server_state.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/number_files_left.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/Server/timer_helper.dart';
+
 import 'package:flutterfrontenduniprojectmanager/router/router.dart';
 
 class InProcessD2dSheet extends ConsumerStatefulWidget {
@@ -50,21 +52,17 @@ class _InProcessD2dSheetState extends ConsumerState<InProcessD2dSheet> {
   ///authorized request which mean the qr code is simply scanned
   void _startListening() {
     
-    ///why we are using number of files to detect an authorized request ? 
-    ///because how we initialize it , we init it after we receive the first request , and after we validate
-    ///the token , which mean the qr code is scanned
-    ref.listenManual<int?>(filesLeftProvider, (previous, next) {
-      if (previous != null && (next == 0 || next == null)) {
-        _closeSheet();
-      }
-    });
 
-    // Timer ran out while no request ever arrived 
-    ref.listenManual<int?>(timerHelperProvider, (previous, next) {
-      if (previous != null &&
-          next == null ) {
-        _closeSheet();
-      }
+    ref.listenManual<ServerStates>(currentServerStateProvider, (previous,next){
+      if(
+        (previous == null || previous == ServerStates.processing || previous == ServerStates.idle)  
+        &&
+        (next == ServerStates.stopping || next == ServerStates.terminated)
+        ){
+          _closeSheet();
+
+        }
+
     });
   }
 

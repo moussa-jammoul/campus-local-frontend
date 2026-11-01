@@ -2,11 +2,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/timer_helper.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/current_server_state.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/number_files_left.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/qrcode.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/widgets/in_process_d2d_sheet.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/Server/server_service.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/Server/timer_helper.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ServerSide/server_side_service.dart';
 import 'package:flutterfrontenduniprojectmanager/router/router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -50,30 +51,27 @@ class _QrCodeSheetState extends ConsumerState<QrCodeSheet> {
   ///authorized request which mean the qr code is simply scanned
   void _startListening() {
     
-    ///why we are using number of files to detect an authorized request ? 
-    ///because how we initialize it , we init it after we receive the first request , and after we validate
-    ///the token , which mean the qr code is scanned
-    ref.listenManual<int?>(filesLeftProvider, (previous, next) {
-      if (previous == null && next != null) {
-        _closeSheet();
+   
+    ///listening to the server state , so we know when we should close the sheet , open the second sheet ...
+    ref.listenManual<ServerStates>(currentServerStateProvider, (previous,next){
+      if(
+        (
+       (previous == null || previous == ServerStates.waitingToScanQrCode)
+       &&  (next == ServerStates.processing || next == ServerStates.idle)
+        )
+       ){
+         _closeSheet();
 
         //synchronized with closure of the QR code sheet
-        InProcessD2dSheet.show();
-        //TODO splitting server set up and d2d feature (moving server set up to core)
-      }
+        InProcessD2dSheet.show();     
+       } else if((previous == null || previous == ServerStates.waitingToScanQrCode) 
+       && (next == ServerStates.terminated || next == ServerStates.stopping)
+       ){
+        _closeSheet();
+       }
+
     });
 
-    // Timer ran out while no request ever arrived 
-    ref.listenManual<int?>(timerHelperProvider, (previous, next) {
-      if (previous != null &&
-          next == null &&
-          ref.read(filesLeftProvider) == null) {
-        _closeSheet();
-        ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('QR code expired')),
-        );
-      }
-    });
   }
 
   void _closeSheet() {
@@ -172,10 +170,10 @@ class _QrCodeSheetState extends ConsumerState<QrCodeSheet> {
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () async {
-                      final server = ref.read(serverServicerProvider.notifier);
-                      _closed = true; // so no listener tries to pop again
+                      final serverD2D = ref.read(serverServicerD2DProvider.notifier);
+                      _closed = true; 
                       Navigator.of(context).pop();
-                      await server.stopProcess();
+                      await serverD2D.stopServerD2D();
                     },
                     child: const Text('Cancel'),
                   ),
