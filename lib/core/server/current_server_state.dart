@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
+import 'package:logger/logger.dart';
 
 enum ServerStates{
   terminated, //server stopped
@@ -10,14 +12,17 @@ enum ServerStates{
 }
 
 class CurrentServerState extends Notifier<ServerStates> {
+  late Logger logger;
   @override
   ServerStates build() {
+    logger = ref.read(loggerProvider);
     return ServerStates.terminated;
   }
 
   ServerStates geCurrentState() => state;
 
   void changeCurrentState(ServerStates newState){
+    logger.i("State of the server changes , current state : $state , new state : $newState");
     state = newState;
   }
 

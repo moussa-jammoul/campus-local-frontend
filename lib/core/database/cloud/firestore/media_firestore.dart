@@ -122,8 +122,11 @@ class  MediaFirestore extends Notifier<void> implements MediaCloudDomain {
     .orderBy(FieldPath.documentId)
     .startAfter([lastTimeUpdatedDataFromTheCloud, lastUUIDmediaInsertedLocally])
     .get();
-
+    
     final rawData = rawDataCollection.docs;
+     logger.i("number of media fetched from cloud : ${rawData.length}");
+    
+       
         return rawData.map((rawMedia){
           return MediaForm.fromFirestore(rawMedia.data(), rawMedia.id);
         }).toList();                              

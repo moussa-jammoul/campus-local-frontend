@@ -56,25 +56,25 @@ class _QrCodeSheetState extends ConsumerState<QrCodeSheet> {
     ref.listenManual<ServerStates>(currentServerStateProvider, (previous,next){
       if(
         (
-       (previous == null || previous == ServerStates.waitingToScanQrCode)
+       (previous == null || previous == ServerStates.waitingToScanQrCode || previous == ServerStates.starting)
        &&  (next == ServerStates.processing || next == ServerStates.idle)
         )
        ){
-         _closeSheet();
+         closeSheet();
 
         //synchronized with closure of the QR code sheet
         InProcessD2dSheet.show();     
-       } else if((previous == null || previous == ServerStates.waitingToScanQrCode) 
+       } else if((previous == null || previous == ServerStates.waitingToScanQrCode || previous == ServerStates.starting) 
        && (next == ServerStates.terminated || next == ServerStates.stopping)
        ){
-        _closeSheet();
+        closeSheet();
        }
 
     });
 
   }
 
-  void _closeSheet() {
+  void closeSheet() {
     if (_closed || !mounted) return;
     _closed = true;
     Navigator.of(context).pop();

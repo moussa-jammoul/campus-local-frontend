@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/courses_cloud_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/device_token_cloud_domain.dart';
@@ -116,8 +117,15 @@ Future<void> refreshLinkedDevices() async {
   @override
   Future<void> openSecureServerConnection() async {
     logger.i("starting the server process...");
-    await ref.read(serverServicerD2DProvider.notifier).startServerD2D();
     QrCodeSheet.show();
+    try{
+    await ref.read(serverServicerD2DProvider.notifier).startServerD2D();
+    } catch(e){
+      
+      logger.e(e);
+      rethrow;
+    }
+    
   }
 
 }

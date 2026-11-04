@@ -12,8 +12,7 @@ import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSha
 import 'package:logger/logger.dart';
 
 
-//TODO test the work 
-//curl -k "https://IPV4:PORT/files/UUID" -H "x-token: TOKEN" -H "x-files-number: N" -o "%USERPROFILE%\Downloads\test.jpg"
+
 
 class ServerSideService extends Notifier<void>{
 
@@ -28,40 +27,45 @@ class ServerSideService extends Notifier<void>{
 
 
 Future<void> startServerD2D() async{
+  try{
   final startProcessData = await ref.read(serverSetUpProvider.notifier).startProcess();
   if(startProcessData == null){
-    throw Error();
+    throw "failed to start the server";
   }
 
   final qrcodeDataJson = startProcessData.jsonQRcodeData;
   if(qrcodeDataJson == null){
-    throw Error();
+    throw "failed to generate Qr code";
   }
   ref.read(qrCodeDataProvider.notifier).addData(qrcodeDataJson);
+  } catch(e){
+    logger.e(e);
+    rethrow;
+  }
 }
 
 Future<void> stopServerD2D() async{
     
     ref.read(filesLeftProvider.notifier).reset();  
     ref.read(qrCodeDataProvider.notifier).clear();
-    await ref.read(serverSetUpProvider.notifier).startProcess();
+    await ref.read(serverSetUpProvider.notifier).stopProcess();
 }
 
 
-Future<void> sendFile(HttpRequest req, String uuid , int nbOfFiles) async {
+Future<bool> sendFile(HttpRequest req, String uuid , int nbOfFiles) async {
 
   
-
+  
   //init the nb of files if it isn't initialized
   if(ref.read(filesLeftProvider.notifier).getMax() == null){
     ref.read(filesLeftProvider.notifier).setTotal(nbOfFiles);
   }
-  //auto - close the server
-  if(ref.read(filesLeftProvider) == 0){
-    await stopServerD2D();
-  }
+
+  bool filesDone = false;
+  
 
   try{
+    
 
   logger.i('_sendFile: looking for file $uuid');
   final file = await ref.read(mediaProvider.notifier).returnRawFile(uuid); 
@@ -69,8 +73,7 @@ Future<void> sendFile(HttpRequest req, String uuid , int nbOfFiles) async {
     logger.i('_sendFile: file $uuid not found, answering 404');
     req.response.statusCode = HttpStatus.notFound;
     await req.response.close();
-    return;
-  }
+  }else{
 
   final length = await file.length();
   logger.i('_sendFile: file found, sending $length bytes');
@@ -81,12 +84,19 @@ Future<void> sendFile(HttpRequest req, String uuid , int nbOfFiles) async {
   await req.response.addStream(file.openRead());
   await req.response.close();
   logger.i('_sendFile: file $uuid sent completely');
+
+  }
   } catch(e){
     logger.i(e);
-    return;
   } finally{
     ref.read(filesLeftProvider.notifier).decrement();
+    //auto - close the server
+    if(ref.read(filesLeftProvider) == 0){
+      filesDone = true;
+    await stopServerD2D();
+    }  
   }
+  return filesDone;
 }
  
 }

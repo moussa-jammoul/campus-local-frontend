@@ -1,5 +1,6 @@
 
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,7 +37,10 @@ class MulticastDnsService extends Notifier<void> implements MulticastDnsServiceD
     );
     
 
-    _registration = await dns.register(service);
+    _registration = await  dns.register(service).timeout(
+  const Duration(seconds: 10),
+  onTimeout: () => throw TimeoutException('mDNS register timed out'),
+  );
     logger.i('sendMDNS: registered as ${_registration!.service.name}');
   } catch (e) {
     logger.e(e);

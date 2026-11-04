@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FilesLeftNotifier extends Notifier<int?> {
 
-  late final int? maxNBfiles;
+  int? maxNBfiles;
 
 
   @override

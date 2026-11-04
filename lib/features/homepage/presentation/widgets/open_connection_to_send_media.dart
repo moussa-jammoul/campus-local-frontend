@@ -22,6 +22,22 @@ class _OpenConnectionToSendMediaState
       await ref
           .read(homePageServiceProvider.notifier)
           .openSecureServerConnection();
+    } catch(e){
+      if(mounted){
+        ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text(
+          "Error while loading the server",   
+        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+      
+      }
     } finally {
      
       if (mounted) setState(() => _isTaped = false);

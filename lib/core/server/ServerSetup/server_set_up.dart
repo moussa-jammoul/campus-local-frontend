@@ -116,11 +116,11 @@ class ServerSetUp extends Notifier<void> implements ServerSetUpDomain {
     return null;
   }
 
-  //starting the mDNS service
+  
   await ref.read(multicastDnsServiceProvider.notifier).sendMDNS(devicename: deviceTokenData.deviceName, deviceID: deviceTokenData.uniqueDeviceAccountId, port: port);
   
    //generating Qr code payload
-
+   logger.i("generating qr code...");
    final jsonQRcodeData =ref.read(qrCodeServiceProvider.notifier).generateQrCodePayLoad(
     deviceId: deviceTokenData.uniqueDeviceAccountId,
     fingerPrint: ref.read(identityGenerationProvider.notifier).extractFingerPrintFromCertificate(cert: identity.certPem),  //extracting finger print from the certificate
@@ -130,13 +130,7 @@ class ServerSetUp extends Notifier<void> implements ServerSetUpDomain {
    
    ref.read(timerHelperProvider.notifier).startTimer(stopProcess, seconds: firstScanSeconds);
 
-   //TODO remember to delete it
-   final interfaces = await NetworkInterface.list(type: InternetAddressType.IPv4);
-for (final i in interfaces) {
-  for (final a in i.addresses) {
-    logger.i('DEBUG interface ${i.name}: ${a.address}');
-  }
-}
+   
     logger.i("data :$port , $token ");
     ref.read(currentServerStateProvider.notifier).changeCurrentState(ServerStates.waitingToScanQrCode);
 
