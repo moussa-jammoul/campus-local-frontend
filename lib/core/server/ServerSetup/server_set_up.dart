@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/SecureStorage/SecureStorageServices/LocalServer/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/device_token_provider.dart';
@@ -12,9 +13,10 @@ import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/server_
 import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/timer_helper.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/constantversions.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/current_server_state.dart';
-import 'package:flutterfrontenduniprojectmanager/core/server/mdns/multicast_dns_service.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/qrCode/qrcode_service.dart';
 import 'package:logger/logger.dart';
+import 'package:network_info_plus/network_info_plus.dart';
+
 
 
 ///HOW to use this service ? if u are building a feature that require to start a server process ,
@@ -33,6 +35,29 @@ class ServerSetUp extends Notifier<void> implements ServerSetUpDomain {
   @override
   void build() {
     logger = ref.read(loggerProvider);
+  }
+
+  Future<String?> _getLocalIP() async{
+    final ip = await NetworkInfo().getWifiIP(); //null if not on wifi  , e.g a user could be on mobile data + hotspot  , or without a wifi
+    if(ip != null && ip.isNotEmpty){
+      return ip;
+    }
+
+    final interfaces = await NetworkInterface.list(
+    type: InternetAddressType.IPv4,
+    includeLoopback: false,
+    includeLinkLocal: false,
+    );
+
+    const hotspotNames = ['ap0', 'swlan0', 'wlan1', 'wlan2'];
+    for (final name in hotspotNames) {
+    for (final i in interfaces.where((i) => i.name == name)) {
+      if (i.addresses.isNotEmpty) return i.addresses.first.address;
+    }
+  }
+
+  return null;
+
   }
 
   @override
@@ -116,22 +141,32 @@ class ServerSetUp extends Notifier<void> implements ServerSetUpDomain {
     return null;
   }
 
-  
-  await ref.read(multicastDnsServiceProvider.notifier).sendMDNS(devicename: deviceTokenData.deviceName, deviceID: deviceTokenData.uniqueDeviceAccountId, port: port);
-  
+  final ip = await _getLocalIP(); 
+  if(ip == null){
+    throw "No ip address found";
+  }
+
+  final userUid = FirebaseAuth.instance.currentUser?.uid;
+  if(userUid == null){
+    throw "Uid not initialized";
+  }
+
+   
    //generating Qr code payload
    logger.i("generating qr code...");
    final jsonQRcodeData =ref.read(qrCodeServiceProvider.notifier).generateQrCodePayLoad(
-    deviceId: deviceTokenData.uniqueDeviceAccountId,
     fingerPrint: ref.read(identityGenerationProvider.notifier).extractFingerPrintFromCertificate(cert: identity.certPem),  //extracting finger print from the certificate
-    token: token
+    token: token,
+    ipLAN: ip,
+    port: port,
+    userUid: userUid,
    );
 
    
-   ref.read(timerHelperProvider.notifier).startTimer(stopProcess, seconds: firstScanSeconds);
+    ref.read(timerHelperProvider.notifier).startTimer(stopProcess, seconds: firstScanSeconds);
 
    
-    logger.i("data :$port , $token ");
+    logger.i("data :$port , $token , $ip ");
     ref.read(currentServerStateProvider.notifier).changeCurrentState(ServerStates.waitingToScanQrCode);
 
     return ProcessStartReturn(jsonQRcodeData: jsonQRcodeData );
@@ -150,7 +185,6 @@ class ServerSetUp extends Notifier<void> implements ServerSetUpDomain {
       ref.read(currentServerStateProvider.notifier).changeCurrentState(ServerStates.stopping);
       ref.read(timerHelperProvider.notifier).stopTimer();
      
-    await ref.read(multicastDnsServiceProvider.notifier).unregisterMdns();
     await stopServer();
 
     }catch(e){

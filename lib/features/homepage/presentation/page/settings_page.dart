@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/fetsh_any_missed_media_button.dart';
+import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/fetch_any_missed_media_button.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/light_dark_mode_switcher.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/linked_accounts.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/logout_tile.dart';

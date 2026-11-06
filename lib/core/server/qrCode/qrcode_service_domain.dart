@@ -4,7 +4,9 @@ abstract class QrcodeServiceDomain{
   String generateQrCodePayLoad({ //transform data into json so we use them to generate qr code (we push the data to a provider)
     required String token,
     required String fingerPrint,
-    required String deviceId,
+    required int port,
+    required String ipLAN,
+    required String userUid,
   });
 
 }

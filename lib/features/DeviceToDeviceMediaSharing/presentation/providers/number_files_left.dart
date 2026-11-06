@@ -21,7 +21,7 @@ class FilesLeftNotifier extends Notifier<int?> {
     return next;
   }
 
-  void reset() => state = null;
+  void reset() {state = null; maxNBfiles = null;}
 }
 
 final filesLeftProvider = NotifierProvider<FilesLeftNotifier, int?>(FilesLeftNotifier.new);

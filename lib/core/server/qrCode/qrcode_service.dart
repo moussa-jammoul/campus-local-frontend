@@ -33,13 +33,22 @@ return token;
   }
 
   @override
-  String generateQrCodePayLoad({required String token, required String fingerPrint, required String deviceId}) {
-    logger.i('generateQrCodePayLoad: building payload for device $deviceId');
+  String generateQrCodePayLoad({
+    required String token, 
+    required String fingerPrint, 
+    required int port,
+    required String ipLAN,
+    required String userUid,
+
+    }) {
+    logger.i('generateQrCodePayLoad: building payload');
   final json =  jsonEncode({
     "v" : qRCODEVERSIONPROTOCOL , //version protocol
     "t" : token,
     "fp" : fingerPrint,
-    "id" : deviceId
+    "user" : userUid  , //uid of the user generating the qr code
+    "port" : port,
+    'ip' : ipLAN,
   }); 
   return json;
   }
