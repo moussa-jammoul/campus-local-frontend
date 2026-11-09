@@ -68,12 +68,9 @@ class LoginApiFirebase extends Notifier<void> implements LoginApiDomain {
   @override
   Future<UserCredential?> signInWithGoogle() async {
     try{
-       if (kIsWeb) {
-      final provider = GoogleAuthProvider()
-        ..addScope('email')
-        ..addScope('profile');
-      return await FirebaseAuth.instance.signInWithPopup(provider);
-    }
+
+      logger.i("signInWithGoogle data layer called, instance=${identityHashCode(this)}, ");
+       
     final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
 
     

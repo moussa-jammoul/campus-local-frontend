@@ -155,7 +155,7 @@ class GoogleSignInButton extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final asset = isDark
-        ? 'assets/icons/google_signin_dark_pill_android_web.png' /// for android , web build.
+        ? 'assets/icons/google_signin_dark_pill_android_web.png' /// for android .
         : 'assets/icons/google_signin_light_pill_android_web.png';///ios require different image (source : google guide line)
 
     return Material(

@@ -6,7 +6,6 @@ class CardStyleWidget extends StatelessWidget {
     super.key,
     required this.child,
     this.constraints,
-    this.kwidth,
     this.margin = const EdgeInsetsGeometry.all(10),
     this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
   });
@@ -14,7 +13,7 @@ class CardStyleWidget extends StatelessWidget {
   final Widget child;
   final BoxConstraints? constraints;
   final EdgeInsetsGeometry padding;
-  final double? kwidth;
+  
   final EdgeInsetsGeometry margin;
 
   @override
@@ -22,7 +21,8 @@ class CardStyleWidget extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return Container(
-      width: kwidth ?? kSettingsWidth,
+      
+      //width: kwidth ?? kSettingsWidth,
       constraints: constraints,
       padding: padding,
       margin: margin,

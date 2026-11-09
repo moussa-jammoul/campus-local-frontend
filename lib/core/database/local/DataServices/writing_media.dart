@@ -7,14 +7,7 @@ import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:logger/logger.dart';
 
 
-///this class is a quick helper that hold
-///a media uuid with its type
-class MediaUUIDandTYPE{
-  final String uuid;
-  final String type;
 
-  const MediaUUIDandTYPE({required this.type , required this.uuid});
-}
 
 
 
@@ -119,6 +112,7 @@ class WritingMedia extends Notifier<void> {
             isFavorite: rawRow.isFavorite,
             createdAt: rawRow.createdAt,
             updatedAt: rawRow.updatedAt,
+            mediaExistLocally: rawRow.mediaAvailableLocally
           );
           return item;
         }).toList();
@@ -156,7 +150,7 @@ class WritingMedia extends Notifier<void> {
     );
   }
 
-  Future<MediaForm> addData(MediaForm data , bool recievedFromCloudWithoutMedia) async {
+  Future<MediaForm> addData(MediaForm data , bool mediaExistLocally) async {
     if (db != null) {
       logger.i('writing data locally: $data');
       try {
@@ -173,7 +167,7 @@ class WritingMedia extends Notifier<void> {
                 fileType: data.filetype,
                 fileSizeByte: data.filesizeByte,
                 isFavorite: Value(data.isFavorite),
-                mediaAvailableLocally: Value(recievedFromCloudWithoutMedia)
+                mediaAvailableLocally: Value(mediaExistLocally)
 
               ),
             );
@@ -252,8 +246,32 @@ class WritingMedia extends Notifier<void> {
       throw Error();
     }
   }
+  
 
+
+  Future<bool> checkingIfMediaExistToAMedia(int id) async{
+    if(db != null){
+      logger.i('checking if media exist for : $id');
+      try{
+        final data = await (db!.select(db!.mediaDB)..where((t) => t.id.equals(id))).getSingleOrNull();
+        if(data == null) return false;
+
+        return data.mediaAvailableLocally;
+      } catch(e){
+        logger.e(e);
+        return false;
+      }
+
+
+    } else{
+      logger.e('db is null, cannot return the media');
+      return false;
+    }
+
+
+  }
   ///labeling that the media exist locally
+  
   Future<void> labelMediaAvailableLocallyTrue(int id) async{
     if(db != null){
       logger.i('labeling media as available locally: $id');
@@ -273,20 +291,37 @@ class WritingMedia extends Notifier<void> {
 
 
     } else{
-      logger.e('db is null, cannot update media');
+      logger.e('db is null, cannot label media as existing');
       throw Error();
     }
 
   }
   
   ///used to filter media that does not exist locally 
-  Future<List<MediaUUIDandTYPE>?> returnAllUnvailableMedia() async{
+  Future<List<MediaForm>?> returnAllUnvailableMedia(String userUid) async{
     if(db != null){
       logger.i("fetching all unvailable media locally");
       try{
-        final rows = await (db!.select(db!.mediaDB)..where((t)=>t.mediaAvailableLocally.equals(false))).get();
+        final rows = await (db!.select(db!.mediaDB)..where(
+          (t)=>t.mediaAvailableLocally.equals(false)
+          & t.userUid.equals(userUid)
+          )).get();
         return rows.map((row){
-          return MediaUUIDandTYPE(type: row.fileType, uuid: row.uuid);
+          return MediaForm(
+            uuid: row.uuid,
+            userUid: row.userUid, 
+            createdAt: row.createdAt,
+            updatedAt: row.updatedAt,
+            courseUuid: row.courseUuid, 
+            filename: row.fileName,
+            filepath: row.filePath,
+           filetype: row.fileType,
+           filesizeByte: row.fileSizeByte,
+           isFavorite: row.isFavorite,
+           id: row.id,
+           fileDescription: row.fileDescription,
+           
+            );
         }).toList();
       } catch(e){
         logger.e(e);
@@ -294,7 +329,7 @@ class WritingMedia extends Notifier<void> {
       }
 
     } else{
-      logger.e('db is null, cannot update media');
+      logger.e('db is null, cannot filter the media that doesnt exist locally');
       return null;
 
     }

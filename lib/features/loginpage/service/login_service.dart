@@ -9,8 +9,15 @@ import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/service/login_service_domain.dart';
 import 'package:logger/logger.dart';
 
+bool isSignedIn() => FirebaseAuth.instance.currentUser != null;
+
 
 class LoginService extends Notifier<void> implements LoginServiceDomain {
+
+
+  bool signingIn = false;
+
+
   late Logger logger;
   @override
   void build() {
@@ -19,6 +26,14 @@ class LoginService extends Notifier<void> implements LoginServiceDomain {
   
   @override
   Future<void> createAccount(String email, String password, String passwordRepeated, String fullName, String dateOfBirth, String role, String major) async{
+     if(signingIn || isSignedIn()) return;
+      signingIn = true;
+    try{
+
+     
+
+     
+
     
     logger.i("creating account !");
     final valid = _validateCreateAccount(email, password, passwordRepeated, fullName, dateOfBirth, major);
@@ -37,12 +52,22 @@ class LoginService extends Notifier<void> implements LoginServiceDomain {
     if(FirebaseAuth.instance.currentUser != null){
     ref.read(additionalDataFromLoginProvider.notifier).addNewData(UserAdditionalData(uid: FirebaseAuth.instance.currentUser!.uid, email: email, fullname: fullName, dateOfBirth: dateOfBirth, role: role, major: major));
     }
+    } catch(e){
+      ref.read(createAccountErrorsProvider.notifier).customError('An error occurred while creating your account. The email may already be in use, or you may have lost connection while creating the account. Please try again later.');
+      rethrow;
+    } finally{
+      signingIn = false;
+    }
     
     
   }
 
   @override
   Future<void> signIn(String email, String password) async {
+    if(signingIn || isSignedIn()) return;
+      signingIn = true;
+    try{
+       
     logger.i("signing in !");
     final valid = _validateEmailPass(email, password);
     if(!valid){
@@ -57,12 +82,30 @@ class LoginService extends Notifier<void> implements LoginServiceDomain {
       return ;
     }
 
+    } catch(e){
+      ref.read(createAccountErrorsProvider.notifier).customError('An error occurred while signing in. The email may not exist as a user, or you may have lost connection while signing in. Please try again later.');
+      logger.e(e);
+      rethrow;
+    } finally{
+      signingIn = false;
+    }
+
     
 
   }
 
   @override
   Future<void> signInWithGoogle() async {
+
+    if(signingIn || isSignedIn()) return;
+      signingIn = true;
+
+    try{
+      logger.i("signInWithGoogle called, instance=${identityHashCode(this)}, signingIn=$signingIn");
+      
+      logger.i("signInWithGoogle called in the same function, instance=${identityHashCode(this)}, signingIn=$signingIn");
+      
+      
     logger.i("signing in with google !");
     final cred = await ref.read(loginApiProvider.notifier).signInWithGoogle();
     if(cred == null){
@@ -72,6 +115,13 @@ class LoginService extends Notifier<void> implements LoginServiceDomain {
     } 
     ///no need her to do anything if new account , everything handled automatically to show the page for 
     ///additional data to insert them by user
+    } catch(e){
+      ref.read(emailPasswordErrorsProvider.notifier).customError('failed to sign in with google');
+      logger.e(e);
+    } finally{
+      signingIn = false;
+     
+    }
     
   }
 

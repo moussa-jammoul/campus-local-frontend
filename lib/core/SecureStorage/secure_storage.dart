@@ -9,8 +9,8 @@ import 'package:logger/logger.dart';
 class SecureStore extends Notifier<void> {
   late Logger logger;
   late FlutterSecureStorage securestorage;
-  static String? _KCERT; 
-  static String? _KSECRETKEY;
+  static final String _KCERT = "SERVER_CERTIFICATION" ; 
+  static final String _KSECRETKEY ="SERVER_SECRET_KEY" ;
 
   @override
   void build() {
@@ -19,19 +19,10 @@ class SecureStore extends Notifier<void> {
   }
   
 
-  //initializing key names , because they depend on device unique id
-  void initKeys({
-    String? cert,
-    String? secretkeyserver
-  }){
-    _KCERT = cert;
-    _KSECRETKEY = secretkeyserver;
-  }
-
   Future<void> writeServerCertification(String cert) async{
-    if(_KCERT != null) throw Error();
+   
     try{
-      await securestorage.write(key: _KCERT!, value: cert);
+      await securestorage.write(key: _KCERT, value: cert);
     } catch(e){
       logger.e(e);
       rethrow;
@@ -39,9 +30,9 @@ class SecureStore extends Notifier<void> {
   }
 
   Future<void> writeSevrerSecretKey(String secret) async{
-    if(_KSECRETKEY != null) throw Error();
+   
     try{
-      await securestorage.write(key: _KSECRETKEY!, value: secret);
+      await securestorage.write(key: _KSECRETKEY, value: secret);
     } catch(e){
       logger.e(e);
       rethrow;
@@ -49,11 +40,11 @@ class SecureStore extends Notifier<void> {
   }
 
   Future<String?> readServerCertification() async {
-     if(_KCERT != null) throw Error();
+     
   try {
     
-    if (!await securestorage.containsKey(key: _KCERT!)) return null;
-    return await securestorage.read(key: _KCERT!);
+    if (!await securestorage.containsKey(key: _KCERT)) return null;
+    return await securestorage.read(key: _KCERT);
   } catch (e) {
     logger.e(e);
     return null;
@@ -61,10 +52,10 @@ class SecureStore extends Notifier<void> {
 }
 
   Future<String?> readServerSecretKey() async {
-    if(_KSECRETKEY != null) throw Error();
+    
   try {
-    if (!await securestorage.containsKey(key: _KSECRETKEY!)) return null;
-    return await securestorage.read(key: _KSECRETKEY!);
+    if (!await securestorage.containsKey(key: _KSECRETKEY)) return null;
+    return await securestorage.read(key: _KSECRETKEY);
   } catch (e) {
     logger.e(e);
     return null;

@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 
-///format 
-const mediaImageFormats = ['png' , 'jpg'];
-const mediaVideoFormats = ['mp4', 'mov', 'mkv', 'avi'];
+///formats 
+const mediaImageFormats = ['png' , 'jpg' , 'jpeg'];
+const mediaVideoFormats = ['mp4', 'mov', 'mkv', 'avi' ,'m4v'];
 const mediaFileFormats = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'zip'];
 
 
@@ -18,12 +18,14 @@ class MediaForm {
   final String filetype;
   final int filesizeByte;
   final bool isFavorite;
+  final bool? mediaExistLocally;
   final DateTime? createdAt; //auto generated in the db
   final DateTime? updatedAt; //auto generated in the db
 
   const MediaForm({
     this.id,
     this.uuid,
+    this.mediaExistLocally,
     required this.userUid,
     required this.courseUuid,
     required this.filename,

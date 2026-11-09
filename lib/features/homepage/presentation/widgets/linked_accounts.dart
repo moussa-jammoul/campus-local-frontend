@@ -55,7 +55,12 @@ class _LinkedAccountsTilesState extends ConsumerState<LinkedAccountsTiles> {
     }
 
     return CardStyleWidget(
-      constraints: const BoxConstraints(minHeight: 275, maxHeight: 380),
+      constraints: const BoxConstraints(
+        minHeight: 275, 
+        maxHeight: 380,
+        
+        maxWidth: 450,
+        ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

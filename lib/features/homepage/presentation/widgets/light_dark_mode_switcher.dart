@@ -13,6 +13,11 @@ class AppearanceTile extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark; 
 
     return CardStyleWidget(
+      constraints: const BoxConstraints(
+        
+        
+        maxWidth: 450,
+        ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [

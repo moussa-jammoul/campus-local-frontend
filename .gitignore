@@ -47,3 +47,14 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+#generated plugins
+macos/Flutter/GeneratedPluginRegistrant.swift
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugin_registrant.h
+windows/flutter/generated_plugins.cmake
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugin_registrant.h
+linux/flutter/generated_plugins.cmake
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh

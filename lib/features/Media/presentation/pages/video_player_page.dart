@@ -13,14 +13,17 @@ class VideoPlayerPage extends ConsumerWidget {
     super.key,
     required this.videoPath,
     required this.videoDetail,
+    
   });
 
   final MediaForm videoDetail;
-  final String? videoPath;  
+  final String? videoPath; 
+ 
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
+    final bool mediaExistLocally = videoDetail.mediaExistLocally ?? true; //null not possible , because always the data base init it , and we re-read the inserted data , so we will consider it as true if somehow it read the state directly
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -47,7 +50,7 @@ class VideoPlayerPage extends ConsumerWidget {
           ),
         ],
       ),
-      body: videoPath == null
+      body: videoPath == null || !mediaExistLocally
           ? Center(child: _brokenVideo(scheme))
           : RepaintBoundary(
               

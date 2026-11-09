@@ -131,10 +131,15 @@ class MediaDB extends Table {
   TextColumn get fileType => text()();
   IntColumn get fileSizeByte => integer()();
 
-  //this column right here neither exist in the local state or cloud , only in the local db
+  //this column right here does not exist in the cloud , only in the local db and the state
   //used  to read all uuid of media that does not exist locally  , the default value is "true"
   //meaning that we  add the media directly from the device , when we recieve media from cloud
-  //we override it with false
+  //we override it with false , why we use this model instead of just checking the local media ? 
+  //because its faster , and directly talking with the data-base instead of looking for the entire media uuid 
+  //and checking if it have a local media , a trade off to this model that if a media is deleted somehow outside from the app itself
+  //e.g user enter to the app folders and deleted some , it will be labeled always as "exist media locally" , and not possible to grab
+  //them using the d2d feature... , it is also used as a double check if the media exist , why ? , because lets say user was grabbing media
+  //but abort it or error happened mid session , an image will exist as a path and some bytes their , but broken , so use this as extra check
   BoolColumn get mediaAvailableLocally => boolean().withDefault(const Constant(true))();
 
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();

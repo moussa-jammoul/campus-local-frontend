@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/widgets/number_of_files_that_doesnt_exist_locally_sheet.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/card_style.dart';
+import 'package:flutterfrontenduniprojectmanager/features/homepage/service/home_page_services.dart';
 
 class FetshAnyMissedMediaButton extends ConsumerWidget {
   const FetshAnyMissedMediaButton({super.key});
@@ -8,6 +10,11 @@ class FetshAnyMissedMediaButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return CardStyleWidget(
+      constraints: const BoxConstraints(
+        
+        minWidth: 350,
+        maxWidth: 450,
+        ),
       child: Row(
         spacing: 10,
 
@@ -45,8 +52,47 @@ class FetshAnyMissedMediaButton extends ConsumerWidget {
   color: Colors.transparent,
   child: InkWell(
     borderRadius: BorderRadius.circular(12),
-    onTap: () {
-      // TODO: fetch missing media
+    onTap: () async {
+      try{
+        final media = await ref.read(homePageServiceProvider.notifier).fetchMissedMediaLocally();
+        if(media == null){ //null cover both if empty or no media exist 
+        if(context.mounted){
+        ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text(
+          "All Media Exist Locally !",   
+        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+      }
+
+
+        } else{
+        NumberOfFilesThatDoesntExistLocallySheet.showSheet(media: media);
+        }
+      }catch(e){
+        if(context.mounted){
+        ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text(
+          "Error while fetching media , try again later",   
+        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+      }
+      }
+        
+      
     },
     child: Ink(
       decoration: BoxDecoration(

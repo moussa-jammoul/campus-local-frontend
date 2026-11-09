@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services.dart';
 import 'package:path/path.dart' as p;   // for p.basename
 
@@ -16,7 +17,7 @@ class AddVideoBottomSheetContent extends ConsumerStatefulWidget {
 
 class _AddVideoBottomSheetContentState
     extends ConsumerState<AddVideoBottomSheetContent> {
-  final allowedFormat =  ['mp4', 'mov' , 'mkv' , 'avi'];
+  
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -66,7 +67,7 @@ class _AddVideoBottomSheetContentState
   Future<void> _pickVideo() async {
     final data = await ref
         .read(mediaServiceProvider.notifier)
-        .pickVideo(allowedFormat);
+        .pickVideo(mediaVideoFormats);
 
     if (data != null && data.$1 != null) {
       setState(() {

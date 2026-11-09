@@ -11,16 +11,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/media_cloud_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/media_provider.dart';
+import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/storage/media/media_management.dart';
+import 'package:flutterfrontenduniprojectmanager/features/Media/service/lastSynced/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/lastSynced/last_synced_data.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services_domain.dart';
+import 'package:logger/logger.dart';
 
 class MediaServices extends Notifier<void> implements MediaServicesDomain {
+  late Logger logger;
   
 
   @override
   void build() {
-    
+    logger = ref.read(loggerProvider);
   }
   
   
@@ -40,33 +44,43 @@ class MediaServices extends Notifier<void> implements MediaServicesDomain {
   }
 
   List<MediaForm>? data;
+  try{
 
-  final syncInformation = ref.read(lastsyncedDataProvider);
+  final syncInformation = await ref.read(lastsyncedDataProvider.notifier).readLastSynced();
+  
 
   if (syncInformation == null) {
+    logger.i("no sync information found !");
     ///no local sync info yet, this is a brand new device/account, pull everything
     data = await ref.read(mediaCloudProvider.notifier).fetchAllMedia();
+   
   } else {
     ///already have some data locally, only pull what's missing since last sync
+    logger.i("sync info found ! , ${syncInformation.lastUpdateSynced} ${syncInformation.lastUuidSynced}");
     data = await ref.read(mediaCloudProvider.notifier).syncMedia(
           syncInformation.lastUuidSynced,
           syncInformation.lastUpdateSynced,
         );
   }
 
-  if (data == null) {
+  if (data == null || data.isEmpty) {
+    logger.i("Data of the media recieved is empty , finishing the process....");
     return;
   }
-
-  ///TODO : if data have some media their , we should notifiy the user with an overlay
-  ///to bring them from the device where the data exist , yet this notification is only
-  ///for notifying , device-to-device media sending still not exist in the current time 
-
-  await ref.read(mediaProvider.notifier).addListOfMedia(data , true);
-
+  
+  //updating last synced information
+   ref.read(lastsyncedDataProvider.notifier).updateLastSynced(LastSyncedForm(
+      lastUpdateSynced: data.last.updatedAt!,
+      lastUuidSynced: data.last.uuid!
+    ));
+  await ref.read(mediaProvider.notifier).addListOfMedia(data , false);
+  
   
   if(fromAVisiblePageToRenderData){
   unawaited(refreshDataLocally(courseUuid , fileextention , isFav));
+  }
+  } catch(e){
+    logger.e(e);
   }
   
 }

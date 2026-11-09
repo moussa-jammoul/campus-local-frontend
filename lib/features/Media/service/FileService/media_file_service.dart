@@ -64,7 +64,7 @@ class MediaFileService extends Notifier<void> implements MediaFileServiceDomain 
       isFavorite: isFavorite,
     );
 
-    final inserted = await ref.read(mediaProvider.notifier).addNewMedia(data , false);
+    final inserted = await ref.read(mediaProvider.notifier).addNewMedia(data , true);
     await ref.read(mediaServiceProvider.notifier).refreshDataLocally(courseUuid, mediaFileFormats , false);
     ///local-first architecture: we don't wait on the cloud push here,
     ///it will keep retrying until connection resolves

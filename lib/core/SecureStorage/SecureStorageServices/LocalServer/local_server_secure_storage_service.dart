@@ -21,3 +21,7 @@ class LocalServerSecureStorageService extends Notifier<void> {
     return GeneratedIdentity(cert, key);
   }
 }
+
+final localServerSecureStorageServiceProvider = NotifierProvider<LocalServerSecureStorageService,void>((){
+  return LocalServerSecureStorageService();
+});

@@ -17,11 +17,13 @@ class DetailedImage extends ConsumerWidget {
   const DetailedImage({super.key, required this.binary, required this.imageDetail });
   final MediaForm imageDetail;
   final Uint8List? binary;  
+ 
   
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
+    final bool mediaExistLocally = imageDetail.mediaExistLocally ?? true; //null not possible , because always the data base init it , and we re-read the inserted data , so we will consider it as true if somehow it read the state directly
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -54,7 +56,7 @@ class DetailedImage extends ConsumerWidget {
         
         child:
         
-         binary == null
+         binary == null || !mediaExistLocally
             ? _brokenImage(scheme)
             : InteractiveViewer(
                 minScale: 1,
