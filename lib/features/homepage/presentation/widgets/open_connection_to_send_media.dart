@@ -49,6 +49,11 @@ class _OpenConnectionToSendMediaState
     final scheme = Theme.of(context).colorScheme;
 
     return CardStyleWidget(
+      constraints: const BoxConstraints(
+        
+        minWidth: 350,
+        maxWidth: 450,
+        ),
       child: Row(
         spacing: 10,
         children: [

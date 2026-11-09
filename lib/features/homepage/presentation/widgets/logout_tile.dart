@@ -43,7 +43,10 @@ class LogoutButton extends ConsumerWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return Container(
-      width: kSettingsWidth,
+      constraints: const BoxConstraints(
+        minWidth: 350,
+        maxWidth: 450,
+        ),
       height: 52,
       margin: const EdgeInsets.all(10),
       decoration: BoxDecoration(

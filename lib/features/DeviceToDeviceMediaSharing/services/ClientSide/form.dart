@@ -2,7 +2,7 @@ class QrCodePayLoad{
   final String fingerPrint;
   final String token;
   final int protocolVersion;
-  final String port;
+  final int port;
   final String ip;
   final String accountUid;
 
@@ -13,5 +13,21 @@ class QrCodePayLoad{
     required this.ip,
     required  this.port
     });
+
+  factory QrCodePayLoad.fromJson(
+    {
+    required Map<String, dynamic> json,
+    }
+  )
+  {
+    return QrCodePayLoad(
+  fingerPrint: json['fp'] as String,
+  token: json['t'] as String,
+  protocolVersion: json['v'] as int,
+  accountUid: json['user'] as String,
+  ip: json['ip'] as String,
+  port: json['port'] as int ,
+);
+  }
   
 }

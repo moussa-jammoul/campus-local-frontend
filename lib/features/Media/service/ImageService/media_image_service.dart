@@ -71,7 +71,7 @@ Future<void> addMedia({
       isFavorite: isFavorite,
     );
 
-    final inserted = await ref.read(mediaProvider.notifier).addNewMedia(data , false);
+    final inserted = await ref.read(mediaProvider.notifier).addNewMedia(data , true);
      
      //refreshing state
     await ref.read(mediaServiceProvider.notifier).refreshDataLocally(courseUuid, mediaImageFormats , false);

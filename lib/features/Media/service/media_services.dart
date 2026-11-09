@@ -76,7 +76,7 @@ class MediaServices extends Notifier<void> implements MediaServicesDomain {
       lastUpdateSynced: data.last.updatedAt!,
       lastUuidSynced: data.last.uuid!
     ));
-  await ref.read(mediaProvider.notifier).addListOfMedia(data , true);
+  await ref.read(mediaProvider.notifier).addListOfMedia(data , false);
   
   
   if(fromAVisiblePageToRenderData){

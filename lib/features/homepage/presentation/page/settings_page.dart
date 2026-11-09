@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/current_account_linked_tile.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/fetch_any_missed_media_button.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/light_dark_mode_switcher.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/linked_accounts.dart';
@@ -49,7 +50,7 @@ class SettingsPage extends ConsumerWidget {
           child: SingleChildScrollView(
   
             padding: const EdgeInsets.only(top:toolbarheight + 40 , bottom: 40),
-
+            
             child: Column(
 
               mainAxisAlignment: MainAxisAlignment.center,
@@ -57,7 +58,7 @@ class SettingsPage extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
 
               children: const [
-
+                
                 LinkedAccountsTiles(),
 
                 FetshAnyMissedMediaButton(),
@@ -65,6 +66,8 @@ class SettingsPage extends ConsumerWidget {
                 OpenConnectionToSendMedia(),
 
                 AppearanceTile(),
+
+                CurrentAccountLinkedTile(),
 
                 LogoutButton(),
 

@@ -52,7 +52,7 @@ Future<void> stopServerD2D() async{
 }
 
 
-Future<bool> sendFile(HttpRequest req, String uuid , int nbOfFiles) async {
+Future<void> sendFile(HttpRequest req, String uuid , int nbOfFiles) async {
 
   
   
@@ -60,8 +60,6 @@ Future<bool> sendFile(HttpRequest req, String uuid , int nbOfFiles) async {
   if(ref.read(filesLeftProvider.notifier).getMax() == null){
     ref.read(filesLeftProvider.notifier).setTotal(nbOfFiles);
   }
-
-  bool filesDone = false;
   
 
   try{
@@ -92,11 +90,11 @@ Future<bool> sendFile(HttpRequest req, String uuid , int nbOfFiles) async {
     ref.read(filesLeftProvider.notifier).decrement();
     //auto - close the server
     if(ref.read(filesLeftProvider) == 0){
-      filesDone = true;
+     
     await stopServerD2D();
     }  
   }
-  return filesDone;
+  
 }
  
 }

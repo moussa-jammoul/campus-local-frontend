@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_media.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/media_provider.dart';
@@ -188,9 +189,12 @@ class FileTile extends ConsumerWidget {
       .grabExplicitPath(mediaItem.filepath);
 
   
-  if (!context.mounted) return;
-
-  if (path == null) {
+  
+  
+  if (!context.mounted) return;   
+  final bool mediaExistLocally = mediaItem.mediaExistLocally ?? true; //null not possible , because always the data base init it , and we re-read the inserted data , so we will consider it as true if somehow it read the state directly
+   
+  if (path == null || !mediaExistLocally ) {
     _showMessage(
       context,
       'The file does not exist locally, please make sure to run '

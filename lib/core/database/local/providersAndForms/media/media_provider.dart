@@ -95,10 +95,10 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
   
 
   ///used for adding a single media
-  Future<MediaForm> addNewMedia(MediaForm media , bool recievedFromCloudWithoutMedia) async {
+  Future<MediaForm> addNewMedia(MediaForm media , bool mediaExistLocally) async {
     logger.i('adding new media for the course : ${media.courseUuid}');
     try {
-      final inserted = await ref.read(writeMediaProvider.notifier).addData(media , recievedFromCloudWithoutMedia);
+      final inserted = await ref.read(writeMediaProvider.notifier).addData(media , mediaExistLocally);
 
       ///here , we can't assume that the user still in the page to actually render the new media
       ///because we are here after an asyn , so we can make a quick check by using the current position
@@ -127,10 +127,10 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
   ///for performence and optimization , we split one for adding a list of media , whenever it was called from fetching cloud
   ///media or a future feature to add  multiple media with the same picker , to prevent rebuilding state 
   ///each time  , e.g let's say we fetch 200 media , looping and calling add new media will overload the cpu
-  ///because rebuilding the state list each time until we end (because state is immutable) , here we just call directly 
-  ///state = [...state , ...list] , one rebuild , note that add list media don't touch state , so to update the state
-  ///we should call reset media state first , then loading paginated data
-  Future<void> addListOfMedia(List<MediaForm> data , bool recievedFromCloudWithoutMedia) async{
+  ///because rebuilding the state list each time until we end (because state is immutable) , instead , we rely
+  ///on the service that call this function to rebuild the state using "loadpaginatedData" which live inside
+  ///writingmedia file
+  Future<void> addListOfMedia(List<MediaForm> data , bool mediaExistLocally) async{
     logger.i('adding list of media for the course');
     try{
       List<MediaForm> insertedData = [];
@@ -143,7 +143,7 @@ class MediaProvider extends Notifier<List<MediaForm>?> {
           ///already exist locally, so it is an update (not added to insertedData)
           await updateMedia(media);
         } else {
-          final inserted = await ref.read(writeMediaProvider.notifier).addData(media , recievedFromCloudWithoutMedia);
+          final inserted = await ref.read(writeMediaProvider.notifier).addData(media , mediaExistLocally);
           insertedData.add(inserted);
         }
       }

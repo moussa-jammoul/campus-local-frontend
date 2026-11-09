@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/timer_helper.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/current_server_state.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/number_files_left.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ServerSide/server_side_service.dart';
 
 import 'package:flutterfrontenduniprojectmanager/router/router.dart';
 
@@ -148,6 +149,21 @@ secondsLeft != null
         height: 20,
         child: CircularProgressIndicator(strokeWidth: 2),
       ),
+
+      const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () async {
+                      final serverD2D = ref.read(serverServicerD2DProvider.notifier);
+                      await serverD2D.stopServerD2D();
+                      
+                      _closed = true; 
+                      if(context.mounted) {
+                      Navigator.of(context).pop();
+                      }
+                      
+                    },
+                    child: const Text('Cancel'),
+                  ),
                 
      
                 ],

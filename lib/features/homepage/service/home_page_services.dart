@@ -9,10 +9,12 @@ import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/seme
 import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_courses.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_device_token.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/all_devices_token_provider.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/semester_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/widgets/qr_code_sheet.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ClientSide/device_to_device_service.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ServerSide/server_side_service.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/service/home_page_services_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/data/login_api_firebase.dart';
@@ -125,6 +127,19 @@ Future<void> refreshLinkedDevices() async {
       logger.e(e);
       rethrow;
     }
+    
+  }
+
+  @override
+  Future<List<MediaForm>?> fetchMissedMediaLocally()  async{
+    try{
+      final media = await ref.read(devicetodeviceServiceClientSideProvider.notifier).fetchAllUnvailableMediaLocally();
+      return media;
+    } catch(e){
+      logger.e(e);
+      rethrow;
+    }
+
     
   }
 

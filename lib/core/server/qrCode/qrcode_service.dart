@@ -7,6 +7,18 @@ import 'package:flutterfrontenduniprojectmanager/core/server/constantversions.da
 import 'package:flutterfrontenduniprojectmanager/core/server/qrCode/qrcode_service_domain.dart';
 import 'package:logger/logger.dart';
 
+
+///this class is the base of any other qr code generator related to the server start up , 
+///whenever you want to add extra data to the qr code  , override the generator, something like
+/// .... extend QrcodeService {
+/// @override
+/// ....
+/// }
+/// or if no need to extra stuff but the base , use this service directly via
+/// generate qr pay load
+
+
+
 class QrcodeService extends Notifier<void> implements QrcodeServiceDomain {
   late Logger logger;
   @override
@@ -33,7 +45,7 @@ return token;
   }
 
   @override
-  String generateQrCodePayLoad({
+  String generateQrCodeBasePayLoad({
     required String token, 
     required String fingerPrint, 
     required int port,
@@ -52,6 +64,7 @@ return token;
   }); 
   return json;
   }
+
 
 }
 

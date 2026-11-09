@@ -5,6 +5,10 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/RequestRouter/request_router_service_domain.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/server_set_up.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/timer_helper.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/approvable_source.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/constantversions.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/current_server_state.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/number_files_left.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ServerSide/server_side_service.dart';
@@ -30,8 +34,21 @@ class RequestRouterService extends Notifier<void> implements RequestRouterServic
   }
 
   @override
-  Future<void> handleRequest(HttpRequest req, String token) async {
-     final tokenFromReq = req.headers.value('x-token');
+  Future<void> handleRequest(HttpRequest req, String token ) async {
+     
+      if(ref.read(currentServerStateProvider.notifier).geCurrentState() == ServerStates.waitingToScanQrCode || 
+      ref.read(currentServerStateProvider.notifier).geCurrentState() == ServerStates.idle){
+      ref.read(currentServerStateProvider.notifier).changeCurrentState(ServerStates.processing);
+    } else{
+      return;//server not ready yet , skipping the request
+    }
+     
+     //TODO test this 
+     if(!await ref.read(approvableSourceProvider.notifier).waitApprovment()){
+          return; //the service side of the qr code will handle the server closure , no need to do anything more here
+     }
+     
+    final tokenFromReq = req.headers.value('x-token');
 
     if(tokenFromReq == null || tokenFromReq  != token) {
       //no token in the header , so not authorized , end the request
@@ -40,19 +57,20 @@ class RequestRouterService extends Notifier<void> implements RequestRouterServic
       return ;
     }
 
-    if(ref.read(currentServerStateProvider.notifier).geCurrentState() == ServerStates.waitingToScanQrCode || 
-    ref.read(currentServerStateProvider.notifier).geCurrentState() == ServerStates.idle){
-      ref.read(currentServerStateProvider.notifier).changeCurrentState(ServerStates.processing);
-    } else{
-      return;//server not ready yet , skipping the request
-    }
+   
+
+
    
     final method = req.method;
     final segments = req.uri.pathSegments; 
     
     //request to get a media (second segment in the path represent the file uuid)
     if(method == "GET" && segments[0] == "files" && segments.length == 2){
-      if(!await _routeToSendMediaD2D(req , segments[1])){
+      await _routeToSendMediaD2D(req , segments[1]);
+      if(!(
+        ref.read(currentServerStateProvider) == ServerStates.stopping  //note that this work because the service is the one who call the server closure , and it is awaited inside the router , so we can use the current state to check if we should make it idle 
+        || ref.read(currentServerStateProvider) == ServerStates.terminated
+      )){
       ref.read(currentServerStateProvider.notifier).changeCurrentState(ServerStates.idle);
       } 
       return;
@@ -65,7 +83,7 @@ class RequestRouterService extends Notifier<void> implements RequestRouterServic
   }
   
 
-  Future<bool> _routeToSendMediaD2D(HttpRequest req , String mediaUuid ) async{
+  Future<void> _routeToSendMediaD2D(HttpRequest req , String mediaUuid ) async{
     logger.i("received a request , to D2D router , uuif of the file : $mediaUuid");
     final nbOfFiles = req.headers.value('x-files-number');
     if(nbOfFiles == null){
@@ -73,7 +91,7 @@ class RequestRouterService extends Notifier<void> implements RequestRouterServic
       req.response.statusCode = HttpStatus.badRequest;
       await req.response.close();
      
-      return false;
+      return ;
     }
     int nbOfFilesInt = int.parse(nbOfFiles);
     logger.i("d2d router : number of files : $nbOfFilesInt");
@@ -82,11 +100,11 @@ class RequestRouterService extends Notifier<void> implements RequestRouterServic
       req.response.statusCode = HttpStatus.badRequest;
       await req.response.close();
   
-      return false ;
+      return  ;
     }
     
     //calling the service side of the D2D
-    return await ref.read(serverServicerD2DProvider.notifier).sendFile(req, mediaUuid,nbOfFilesInt);
+    await ref.read(serverServicerD2DProvider.notifier).sendFile(req, mediaUuid,nbOfFilesInt);
 
   }
 

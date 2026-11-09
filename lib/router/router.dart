@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_courses.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_media.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/courses/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/CoursesPage/presentation/page/courses_page.dart';
@@ -112,8 +113,10 @@ final routerProvider = Provider<GoRouter>((ref){
                     GoRoute(
                       path: 'image/:uuid',
                       builder: (context, state) {
+                        
                         final data = state.extra as ImageRouteData;
-                        return DetailedImage(binary: data.bytes, imageDetail: data.imageDetail);
+                       
+                        return DetailedImage(binary: data.bytes, imageDetail: data.imageDetail );
                       },
 
                     )
@@ -137,8 +140,8 @@ final routerProvider = Provider<GoRouter>((ref){
                       path: 'video/:uuid',
                       builder: (context, state) {
                         final data = state.extra as VideoRouteData;
-                        return VideoPlayerPage(videoPath: data.explicitPath, videoDetail: data.videoDetails);
-                        
+                       
+                        return VideoPlayerPage(videoPath: data.explicitPath, videoDetail: data.videoDetails);  
                       },
                     )
                   ]

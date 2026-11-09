@@ -5,6 +5,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/ImageService/media_image_service.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/service/media_services.dart';
 
@@ -91,7 +92,7 @@ class _AddImageBottomSheetContentState
                  
                   GestureDetector(
                     onTap: () async {
-                      final data = await ref.read(mediaServiceProvider.notifier).pickImage(['png' , 'jpg']);
+                      final data = await ref.read(mediaServiceProvider.notifier).pickImage(mediaImageFormats);
                        if(data != null){
                        setState(() {
                        _imageBytes = data.$2;

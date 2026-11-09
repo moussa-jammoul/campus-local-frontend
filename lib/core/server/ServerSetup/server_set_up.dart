@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -11,6 +12,7 @@ import 'package:flutterfrontenduniprojectmanager/core/server/RequestRouter/reque
 import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/server_set_up_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/timer_helper.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/approvable_source.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/constantversions.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/current_server_state.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/qrCode/qrcode_service.dart';
@@ -76,7 +78,15 @@ class ServerSetUp extends Notifier<void> implements ServerSetUpDomain {
      );
      logger.i('bindAndOpenHTTPSCONNECTION: server bound, start listening');
      server.listen(
-      (req)=>ref.read(requestRouterServiceProvider.notifier).handleRequest(req, token),
+      (req) async{
+        ref.read(timerHelperProvider.notifier).stopTimer();//cancel the older timer
+        
+
+        await ref.read(requestRouterServiceProvider.notifier).handleRequest(req, token);
+        ref.read(timerHelperProvider.notifier).startTimer( //start new timer
+        stopProcess
+        ,seconds: idleSeconds);
+        },
       onError: (e) => logger.e('server error: $e'),
       onDone: () => logger.i('Server closed !') ,
      );
@@ -154,7 +164,7 @@ class ServerSetUp extends Notifier<void> implements ServerSetUpDomain {
    
    //generating Qr code payload
    logger.i("generating qr code...");
-   final jsonQRcodeData =ref.read(qrCodeServiceProvider.notifier).generateQrCodePayLoad(
+   final jsonQRcodeData =ref.read(qrCodeServiceProvider.notifier).generateQrCodeBasePayLoad(
     fingerPrint: ref.read(identityGenerationProvider.notifier).extractFingerPrintFromCertificate(cert: identity.certPem),  //extracting finger print from the certificate
     token: token,
     ipLAN: ip,
@@ -191,6 +201,7 @@ class ServerSetUp extends Notifier<void> implements ServerSetUpDomain {
       logger.e("failed to stop the process" , error: e);
     } finally{
       ref.read(currentServerStateProvider.notifier).changeCurrentState(ServerStates.terminated);
+      ref.read(approvableSourceProvider.notifier).reset(); 
     }
 
   }

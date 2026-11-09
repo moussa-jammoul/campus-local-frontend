@@ -174,6 +174,7 @@ class _ImageTileState extends ConsumerState<ImageTile> {
   late final MediaImageService _service;
 
   Uint8List? byte;
+  
   @override
   void initState() {
     super.initState();
@@ -215,6 +216,7 @@ class _ImageTileState extends ConsumerState<ImageTile> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final bool mediaExistLocally = widget.mediaItem.mediaExistLocally ?? true; //null not possible , because always the data base init it , and we re-read the inserted data , so we will consider it as true if somehow it read the state directly
 
     return Container(
       decoration: BoxDecoration(
@@ -232,7 +234,7 @@ class _ImageTileState extends ConsumerState<ImageTile> {
           );
         },
         child:
-       byte == null ? Center(
+       byte == null || !mediaExistLocally ? Center(
         child: Icon(
           Icons.image_rounded,
           size: 32,

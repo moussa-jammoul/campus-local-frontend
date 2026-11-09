@@ -2,7 +2,9 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/server_set_up.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/timer_helper.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/approvable_source.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/current_server_state.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/number_files_left.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/qrcode.dart';
@@ -53,15 +55,110 @@ class _QrCodeSheetState extends ConsumerState<QrCodeSheet> {
     
    
     ///listening to the server state , so we know when we should close the sheet , open the second sheet ...
-    ref.listenManual<ServerStates>(currentServerStateProvider, (previous,next){
+    ref.listenManual<ServerStates>(currentServerStateProvider, (previous,next) async{
+      //TODO fix the race close i create...
       if(
         (
        (previous == null || previous == ServerStates.waitingToScanQrCode || previous == ServerStates.starting)
        &&  (next == ServerStates.processing || next == ServerStates.idle)
         )
        ){
-         closeSheet();
+        final approved = await showDialog<bool>(
+  context: context,
+  barrierColor: const Color.fromARGB(255, 0, 0, 0),
+  barrierDismissible: false,
+  useSafeArea: true,
+  builder: (context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
+    return PopScope(
+      canPop: false, // the back button must not close it, only the two buttons
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: scheme.surface.withValues(alpha: 0.75),
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(
+                  color: scheme.onSurface.withValues(alpha: 0.08),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 8,
+                    children: [
+                      Icon(Icons.warning_amber_rounded, color: scheme.error),
+                      Text(
+                        "Qr Code Scanned",
+                        style: theme.textTheme.titleLarge
+                            ?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    "If You didn't scan The Qr code , Please Abort the process (click 'Abort')",
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: scheme.onSurface.withValues(alpha: 0.75),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    spacing: 12,
+                    children: [
+                      Expanded(
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: scheme.error,
+                            foregroundColor: scheme.onError,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: const Text('Abort'),
+                        ),
+                      ),
+                      Expanded(
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          onPressed: () => Navigator.of(context).pop(true),
+                          child: const Text('Continue'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  },
+);
+         closeSheet();
+         
+         
+         if(approved == null || !approved){
+          ref.read(approvableSourceProvider.notifier).declineSource();
+          await ref.read(serverServicerD2DProvider.notifier).stopServerD2D();
+          return;
+         }
+         ref.read(approvableSourceProvider.notifier).approveSource();
         //synchronized with closure of the QR code sheet
         InProcessD2dSheet.show();     
        } else if((previous == null || previous == ServerStates.waitingToScanQrCode || previous == ServerStates.starting) 

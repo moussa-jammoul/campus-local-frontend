@@ -3,8 +3,11 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_media.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/storage/media/form.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ClientSide/client_side_current_state.dart';
 import 'package:logger/web.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -29,6 +32,46 @@ class MediaManagment extends Notifier<void> {
     final appDocDir = await getApplicationDocumentsDirectory();
     return File(p.join(appDocDir.path, relativePath));
   }
+
+
+
+ Future<void> streamBytesLocally({
+  required Stream<Uint8List> stream,
+  required MediaForm media,
+}) async {
+  final relativePath = p.join('user', media.userUid, 'course', media.courseUuid, 'media', '${media.uuid!}.${media.filetype}');
+  logger.i('Saving media file: ${media.uuid!}.${media.filetype}');
+
+  final file = await _resolveMediaFile(relativePath);
+  await file.create(recursive: true);
+
+  final sink = file.openWrite();
+
+  try {
+    int received = 0; //bytes received
+    await for (final chunk in stream) {
+      sink.add(chunk);
+      received += chunk.length;
+
+      if (received >= 1024 * 1024) { // each 1 MB , flush it
+        await sink.flush();
+        received = 0; 
+        //this is how we abort the process when the process already send a request 
+        //and abort clicked by the user
+        if(ref.read(clientSideCurrentStateProvider) == ClientSideD2DState.aborted){
+          return;
+        }
+      }
+
+    }
+
+    await ref.read(writeMediaProvider.notifier).labelMediaAvailableLocallyTrue(media.id!);
+  } finally {
+    await sink.close();
+    unawaited(_createVideoThumbnail(media.filepath , media.uuid!));
+
+  }
+}
   
   
 

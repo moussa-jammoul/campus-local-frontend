@@ -157,6 +157,10 @@ class HeaderGreetingSection extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return CardStyleWidget(
+      constraints: BoxConstraints(
+        minWidth: 300,
+        maxWidth: double.infinity
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         child: Row(
