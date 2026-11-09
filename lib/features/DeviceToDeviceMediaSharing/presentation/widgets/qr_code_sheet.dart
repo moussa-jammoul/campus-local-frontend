@@ -65,7 +65,7 @@ class _QrCodeSheetState extends ConsumerState<QrCodeSheet> {
        ){
         final approved = await showDialog<bool>(
   context: context,
-  barrierColor: const Color.fromARGB(255, 0, 0, 0),
+  barrierColor: const Color.fromARGB(27, 6, 6, 6),
   barrierDismissible: false,
   useSafeArea: true,
   builder: (context) {

@@ -41,6 +41,8 @@ class MediaManagment extends Notifier<void> {
 }) async {
   final relativePath = p.join('user', media.userUid, 'course', media.courseUuid, 'media', '${media.uuid!}.${media.filetype}');
   logger.i('Saving media file: ${media.uuid!}.${media.filetype}');
+  
+  bool mediaFullBytesSucces = false;
 
   final file = await _resolveMediaFile(relativePath);
   await file.create(recursive: true);
@@ -59,18 +61,24 @@ class MediaManagment extends Notifier<void> {
         //this is how we abort the process when the process already send a request 
         //and abort clicked by the user
         if(ref.read(clientSideCurrentStateProvider) == ClientSideD2DState.aborted){
+          
           return;
         }
       }
 
     }
+    mediaFullBytesSucces = true;
 
     await ref.read(writeMediaProvider.notifier).labelMediaAvailableLocallyTrue(media.id!);
   } finally {
     await sink.close();
+    if(mediaFullBytesSucces){
     unawaited(_createVideoThumbnail(media.filepath , media.uuid!));
-
+    }
+    
   }
+
+  
 }
   
   
