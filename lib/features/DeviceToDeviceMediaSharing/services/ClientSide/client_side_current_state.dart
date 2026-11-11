@@ -8,7 +8,7 @@ enum ClientSideD2DState{ //simple in purpose , current model doesn't require mor
 }
 
 
-class ClientSideCurrentState extends Notifier<ClientSideD2DState>{
+class ClientSideCurrentStateD2D extends Notifier<ClientSideD2DState>{
 
   late Logger logger;
 
@@ -25,4 +25,4 @@ class ClientSideCurrentState extends Notifier<ClientSideD2DState>{
 
 }
 
-final clientSideCurrentStateProvider = NotifierProvider<ClientSideCurrentState,ClientSideD2DState>(ClientSideCurrentState.new);
+final clientSideCurrentStateProvider = NotifierProvider<ClientSideCurrentStateD2D,ClientSideD2DState>(ClientSideCurrentStateD2D.new);

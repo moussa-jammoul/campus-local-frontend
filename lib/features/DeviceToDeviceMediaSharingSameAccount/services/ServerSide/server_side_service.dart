@@ -7,8 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/media_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/server_set_up.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/number_files_left.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/qrcode.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/providers/qrcode_current_data.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/presentation/providers/number_files_left.dart';
 import 'package:logger/logger.dart';
 
 
@@ -33,11 +33,7 @@ Future<void> startServerD2D() async{
     throw "failed to start the server";
   }
 
-  final qrcodeDataJson = startProcessData.jsonQRcodeData;
-  if(qrcodeDataJson == null){
-    throw "failed to generate Qr code";
-  }
-  ref.read(qrCodeDataProvider.notifier).addData(qrcodeDataJson);
+  
   } catch(e){
     logger.e(e);
     rethrow;
@@ -47,7 +43,6 @@ Future<void> startServerD2D() async{
 Future<void> stopServerD2D() async{
     
     ref.read(filesLeftProvider.notifier).reset();  
-    ref.read(qrCodeDataProvider.notifier).clear();
     await ref.read(serverSetUpProvider.notifier).stopProcess();
 }
 

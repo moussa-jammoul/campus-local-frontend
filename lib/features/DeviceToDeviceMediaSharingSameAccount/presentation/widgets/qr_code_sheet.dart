@@ -6,10 +6,11 @@ import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/server_
 import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/timer_helper.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/approvable_source.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/current_server_state.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/number_files_left.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/qrcode.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/widgets/in_process_d2d_sheet.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ServerSide/server_side_service.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/providers/qrcode_current_data.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/presentation/providers/number_files_left.dart';
+
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/presentation/widgets/in_process_d2d_sheet.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/services/ServerSide/server_side_service.dart';
 import 'package:flutterfrontenduniprojectmanager/router/router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -155,7 +156,6 @@ class _QrCodeSheetState extends ConsumerState<QrCodeSheet> {
          
          if(approved == null || !approved){
           ref.read(approvableSourceProvider.notifier).declineSource();
-          await ref.read(serverServicerD2DProvider.notifier).stopServerD2D();
           return;
          }
          ref.read(approvableSourceProvider.notifier).approveSource();

@@ -7,12 +7,12 @@ import 'package:flutterfrontenduniprojectmanager/core/database/local/DataService
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/storage/media/media_management.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/data/d2d_data_layer.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/number_files_recieved.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/qrcode.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ClientSide/client_side_current_state.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ClientSide/device_to_device_service_domain.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ClientSide/form.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/data/d2d_data_layer.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/presentation/providers/number_files_recieved.dart';
+
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/services/ClientSide/client_side_current_state.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/services/ClientSide/device_to_device_service_domain.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/services/ClientSide/form.dart';
 import 'package:logger/logger.dart';
 
 class DeviceToDeviceService extends Notifier<void> implements DeviceToDeviceServiceDomain {

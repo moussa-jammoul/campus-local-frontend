@@ -15,6 +15,7 @@ import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/timer_h
 import 'package:flutterfrontenduniprojectmanager/core/server/approvable_source.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/constantversions.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/current_server_state.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/providers/qrcode_current_data.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/qrCode/qrcode_service.dart';
 import 'package:logger/logger.dart';
 import 'package:network_info_plus/network_info_plus.dart';
@@ -114,10 +115,8 @@ class ServerSetUp extends Notifier<void> implements ServerSetUpDomain {
     if(deviceTokenData == null){
         ref.read(currentServerStateProvider.notifier).changeCurrentState(ServerStates.terminated);
         return null;
-      }
+    }
     if(identity == null){
-      
-      
       final devicename = deviceTokenData.deviceName;
       try{
       await ref.read(identityGenerationProvider.notifier).generateIdentityAndStoreIt(devicename);
@@ -130,6 +129,15 @@ class ServerSetUp extends Notifier<void> implements ServerSetUpDomain {
         ref.read(currentServerStateProvider.notifier).changeCurrentState(ServerStates.terminated);
         logger.e(e);
         return null;
+      }
+    } else{//we skip the validation check if it was just generated
+      final expiringSoon = ref.read(identityGenerationProvider.notifier).isExpiringSoon(identity.certPem, withinHour: 1);
+      if(expiringSoon){
+         final newCert = await ref.read(identityGenerationProvider.notifier).updateCertificateIfExpired(deviceTokenData.deviceName);
+         if(newCert == null) return null;
+         identity = GeneratedIdentity(newCert, identity.keyPem); 
+      } else{
+        logger.i("the cert is not about it expire !");
       }
     }
 
@@ -173,6 +181,7 @@ class ServerSetUp extends Notifier<void> implements ServerSetUpDomain {
    );
 
    
+    ref.read(qrCodeDataProvider.notifier).addData(jsonQRcodeData);
     ref.read(timerHelperProvider.notifier).startTimer(stopProcess, seconds: firstScanSeconds);
 
    
@@ -202,6 +211,7 @@ class ServerSetUp extends Notifier<void> implements ServerSetUpDomain {
     } finally{
       ref.read(currentServerStateProvider.notifier).changeCurrentState(ServerStates.terminated);
       ref.read(approvableSourceProvider.notifier).reset(); 
+      ref.read(qrCodeDataProvider.notifier).clear();
     }
 
   }

@@ -9,8 +9,10 @@ import 'package:flutterfrontenduniprojectmanager/theme/theme_data.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 ///TODO missing in the app : 
-///7-dead lines (add , delete) with its ui , page , small reference in the home page
+///1-sending media between two different accounts
+
 
 final GoogleSignIn googleSignIn = GoogleSignIn.instance;
 

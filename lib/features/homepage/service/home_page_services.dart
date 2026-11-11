@@ -13,9 +13,9 @@ import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAn
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/semester_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/widgets/qr_code_sheet.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ClientSide/device_to_device_service.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ServerSide/server_side_service.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/presentation/widgets/qr_code_sheet.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/services/ClientSide/device_to_device_service.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/services/ServerSide/server_side_service.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/service/home_page_services_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/data/login_api_firebase.dart';
 import 'package:logger/logger.dart';

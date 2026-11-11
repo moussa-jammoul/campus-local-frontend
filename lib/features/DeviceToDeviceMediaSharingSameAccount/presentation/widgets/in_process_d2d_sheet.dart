@@ -2,31 +2,20 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/providers/number_files_recieved.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ClientSide/client_side_current_state.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ClientSide/device_to_device_service.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/timer_helper.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/current_server_state.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/presentation/providers/number_files_left.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/services/ServerSide/server_side_service.dart';
+
 import 'package:flutterfrontenduniprojectmanager/router/router.dart';
 
-class ReceivingFilesD2dSheet extends ConsumerStatefulWidget {
-
-  const ReceivingFilesD2dSheet({
-    super.key,
-    required this.media , 
-    required this.rawQrCode
-    });
-
-    final List<MediaForm> media;
-    final String rawQrCode;
-
+class InProcessD2dSheet extends ConsumerStatefulWidget {
+  const InProcessD2dSheet({super.key});
+  
 
   //using the context of the navigator , please if you want any time in the future to change and use 
   //shell routes , make sure to use the root navigator root context 
-  static Future<void> show({
-    required List<MediaForm> media , 
-    required String rawQrCode
-    
-  }) async {
+  static Future<void> show() async {
     final ctx = navigatorKey.currentContext;
     if(ctx == null) {
       return;
@@ -39,74 +28,47 @@ class ReceivingFilesD2dSheet extends ConsumerStatefulWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withValues(alpha: 0.3),
-      builder: (_) => ReceivingFilesD2dSheet(media: media , rawQrCode: rawQrCode, ),
+      builder: (_) => const InProcessD2dSheet(),
     );
   }
 
   @override
-  ConsumerState<ReceivingFilesD2dSheet> createState() => _ReceivingFilesD2dSheetState();
-
+  ConsumerState<InProcessD2dSheet> createState() => _InProcessD2dSheetState();
 }
 
-
-
-class _ReceivingFilesD2dSheetState extends ConsumerState<ReceivingFilesD2dSheet> {
+class _InProcessD2dSheetState extends ConsumerState<InProcessD2dSheet> {
 
   bool _closed = false;
- 
-
-  Future<void> startTheProcess() async{
-    
-    try{
-    await ref.read(devicetodeviceServiceClientSideProvider.notifier).startProcess(
-      mediaThatDoesntExistLocally: widget.media, 
-      rawQrCodeData: widget.rawQrCode
-      );
-      
-    } catch(e){
-        final ctx = navigatorKey.currentState?.context;
-        if(ctx == null) return;
-        if(ctx.mounted){
-        ScaffoldMessenger.of(ctx)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(
-          "Process Failed .\nPlease make sure both devices on the same network , and belong to the same account",   
-        ),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 3),
-      ),
-    );
-      }
-    } finally{
-      _closeSheet();
-    }
-
-  }  
+  late final int? maxNBFiles;
+  
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-    if (!mounted) return;
-    startTheProcess();
-     _startListening(); 
-  });
-   
+    maxNBFiles = ref.read(filesLeftProvider.notifier).getMax();
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+     if (!mounted) return;
+        _startListening(); 
+    });
+    
   }
 
-  
+  ///listening is to detect automaticaly auto-closure of the sheet , if the time run out , or we receive the first
+  ///authorized request which mean the qr code is simply scanned
   void _startListening() {
     
 
-    ref.listenManual<int?>(filesRecievedProvider, (previous,next){
-      if(previous != null && next == 0){
-        _closeSheet();
-      }
+    ref.listenManual<ServerStates>(currentServerStateProvider, (previous,next){
+      if(
+        (previous == null || previous == ServerStates.processing || previous == ServerStates.idle)  
+        &&
+        (next == ServerStates.stopping || next == ServerStates.terminated)
+        ){
+          _closeSheet();
 
-    });
+        }
+
+    } , fireImmediately: true);
   }
 
   void _closeSheet() {
@@ -118,12 +80,11 @@ class _ReceivingFilesD2dSheetState extends ConsumerState<ReceivingFilesD2dSheet>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final secondsLeft = ref.watch(timerHelperProvider);
+    final nbFilesLeft = ref.watch(filesLeftProvider);
     
-    final nbFilesRecieved = ref.watch(filesRecievedProvider);
 
-      
-    final maxNBFiles = ref.read(filesRecievedProvider.notifier).getMax();
-    
+
     return
     PopScope(
       canPop: false,
@@ -150,13 +111,13 @@ class _ReceivingFilesD2dSheetState extends ConsumerState<ReceivingFilesD2dSheet>
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'Recieving files',
+                    'Sending files',
                      textAlign: TextAlign.center,
                     style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                   'Recieving files may take time ,please do not close the app',
+                   'Sending files may take time , please do not close the app',
                     
                     textAlign: TextAlign.start,
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -166,8 +127,8 @@ class _ReceivingFilesD2dSheetState extends ConsumerState<ReceivingFilesD2dSheet>
                   const SizedBox(height: 20),
                 
                   LinearProgressIndicator(
-  value: (maxNBFiles != null && nbFilesRecieved != null && maxNBFiles > 0)
-      ? (nbFilesRecieved) / maxNBFiles
+  value: (maxNBFiles != null && nbFilesLeft != null && maxNBFiles! > 0)
+      ? (maxNBFiles! - nbFilesLeft) / maxNBFiles!
       : null, // endless animation while the total is unknown
   minHeight: 10,
   borderRadius: BorderRadius.circular(8),
@@ -175,26 +136,40 @@ class _ReceivingFilesD2dSheetState extends ConsumerState<ReceivingFilesD2dSheet>
 const SizedBox(height: 12),
 
 Text(
-  (maxNBFiles != null && nbFilesRecieved != null)
-      ? '$nbFilesRecieved of $maxNBFiles files recieved'
+  (maxNBFiles != null && nbFilesLeft != null)
+      ? '${maxNBFiles! - nbFilesLeft} of $maxNBFiles files sent'
       : 'Preparing...',
   style: Theme.of(context).textTheme.titleMedium,
 ),
-const SizedBox(height: 16),
- 
+const SizedBox(height: 12),
+
+secondsLeft != null
+    ? Text(
+        'Auto abort in ${secondsLeft ~/ 60}:${(secondsLeft % 60).toString().padLeft(2, '0')}',
+        style: Theme.of(context).textTheme.bodySmall,
+      )
+    : const SizedBox(
+        width: 20,
+        height: 20,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      ),
+
+      const SizedBox(height: 16),
                   TextButton(
                     onPressed: () async {
-                     
+                      final serverD2D = ref.read(serverServicerD2DProvider.notifier);
+                      await serverD2D.stopServerD2D();
+                      
                       _closed = true; 
+                      if(context.mounted) {
                       Navigator.of(context).pop();
-                      ref.read(clientSideCurrentStateProvider.notifier).changeCurrentState(ClientSideD2DState.aborted);
+                      }
+                      
                     },
                     child: const Text('Cancel'),
                   ),
-
-                  const SizedBox(height: 12),
-                  
                 
+     
                 ],
               ),
             ),

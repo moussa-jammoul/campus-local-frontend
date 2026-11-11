@@ -1,6 +1,6 @@
 import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_media.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ClientSide/form.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/services/ClientSide/form.dart';
 
 abstract class DeviceToDeviceServiceDomain {
   Future<List<MediaForm>?> fetchAllUnvailableMediaLocally();

@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/widgets/mobile_qr_code_scanner.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/presentation/widgets/mobile_qr_code_scanner.dart';
 import 'package:flutterfrontenduniprojectmanager/router/router.dart';
 
 class NumberOfFilesThatDoesntExistLocallySheet extends ConsumerStatefulWidget {

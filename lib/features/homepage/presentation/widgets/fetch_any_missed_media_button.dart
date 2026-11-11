@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/widgets/number_of_files_that_doesnt_exist_locally_sheet.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/presentation/widgets/number_of_files_that_doesnt_exist_locally_sheet.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/card_style.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/service/home_page_services.dart';
 
