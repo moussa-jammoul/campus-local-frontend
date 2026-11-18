@@ -4,12 +4,14 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/RequestRouter/current_process_type.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/RequestRouter/request_router_service_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/server_set_up.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/timer_helper.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/approvable_source.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/constantversions.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/current_server_state.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/SevrerSide/server_side_d2d.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/presentation/providers/number_files_left.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/services/ServerSide/server_side_service.dart';
 import 'package:logger/logger.dart';
@@ -115,13 +117,15 @@ Future<void> _reply(HttpRequest req, int status) async {
   
 
   Future<void> _routeToSendMediaD2DdifferentAccount(HttpRequest req) async{
-    logger.i("recieved a request , to d2d different account router");
+    //setting the current process is handled inside the service itself , so after the user choose a file , it decide which next sheet to display
     
-
+    logger.i("recieved a request , to d2d different account router");
+    await ref.read(serverServicerD2DDifferentAccountProvider.notifier).sendFile(req);
 
   }
 
   Future<void> _routeToSendMediaD2DsameAccount(HttpRequest req , String mediaUuid ) async{
+    ref.read(currentServerProcessTypeProvider.notifier).setCurrentProcessType(ProcessType.d2dSameAccount);
     logger.i("received a request , to D2D router , uuif of the file : $mediaUuid");
     
     final int? nbOfFilesInt = await () async {

@@ -8,6 +8,7 @@ import 'package:flutterfrontenduniprojectmanager/core/SecureStorage/SecureStorag
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/device_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/Indentity/identity_generation_service.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/RequestRouter/current_process_type.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/RequestRouter/request_router_service.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/server_set_up_domain.dart';
@@ -212,6 +213,7 @@ class ServerSetUp extends Notifier<void> implements ServerSetUpDomain {
       ref.read(currentServerStateProvider.notifier).changeCurrentState(ServerStates.terminated);
       ref.read(approvableSourceProvider.notifier).reset(); 
       ref.read(qrCodeDataProvider.notifier).clear();
+      ref.read(currentServerProcessTypeProvider.notifier).reset();
     }
 
   }

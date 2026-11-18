@@ -10,4 +10,5 @@ abstract class HomePageServicesDomain {
   Future<void> refreshLinkedDevices();
   Future<void> deleteSemesterCascade(int id, String semesterUuid ,String userUid);
   
+  
 }

@@ -49,9 +49,12 @@ class D2dDataLayer extends Notifier<void>{
       BaseOptions(
         baseUrl: endPointPath,
         connectTimeout: const Duration(seconds: 10),
+        queryParameters: {
+          'sameAccount':true,
+        },
         headers: {
           'x-token' : token,
-          'x-files-number' :  nbOfFiles
+          'x-files-number' :  nbOfFiles,
         }
 
       )
@@ -109,6 +112,7 @@ class D2dDataLayer extends Notifier<void>{
     }
 
     try{
+      //here it will throw if the the server didn't find the file targeted 
       final response = await endPoint!.get<ResponseBody>(
       "/$fileUuid",
       options: Options(responseType: ResponseType.stream)

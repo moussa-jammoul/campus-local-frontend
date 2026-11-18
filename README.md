@@ -20,6 +20,9 @@ On the media side, we only store the logical path (e.g. `/semester1/m1101/{media
 
 For multi-device support, the app relies on direct device-to-device transfer over the same LAN/WiFi network: the device holding the file starts a local HTTPS server (self-signed certificate) and advertises itself via mDNS (multicast DNS); the device missing the file discovers it, pairs using a one-time-session PIN, and requests the missing files individually over HTTPS. Never rely on the application as "cloud storage" , it is local-first and device-synced only.
 
+The project also support sending medias between devices over the LAN/WIFI network if two different account , 
+that mean you can share any file you want with any freind any Time you Want with the fastest possible way !
+
 
 ## For developers
 

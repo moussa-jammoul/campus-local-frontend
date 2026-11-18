@@ -11,7 +11,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 
 ///TODO missing in the app : 
+///fix that the sending files wait until the user choose a file ! just change where we change the state of it
+///also i should render only the media available 
+///test the d2d different account sharing
+///fix the readme and make it up to date
 ///1-sending media between two different accounts
+///change the video thumbnail package to a newer one
 
 
 final GoogleSignIn googleSignIn = GoogleSignIn.instance;

@@ -72,30 +72,37 @@ class IdentityGenerationService extends Notifier<void> implements IndentityGener
   }
 
   @override
-  Future<String?> updateCertificateIfExpired(String devicename) async {
-    try{
-      logger.i("updating the certificate");
-      final data = await Isolate.run(() async{
-          final keyPEM = await ref.read(secureStorageProvider.notifier).readServerSecretKey();
-          if(keyPEM == null) return null;
-          final prvtKey = CryptoUtils.rsaPrivateKeyFromPem(keyPEM);
-          final publicKey = RSAPublicKey(prvtKey.modulus!, prvtKey.publicExponent ?? BigInt.from(65537));
-          final csr  = X509Utils.generateRsaCsrPem({'CN': devicename}, prvtKey, publicKey);
-          final cert = X509Utils.generateSelfSignedCertificate(prvtKey, csr, 1);
-          return cert; 
-      });
-      if(data == null) return null;
-      logger.i("Generated a New crt ! writing it locally...");
-      ref.read(secureStorageProvider.notifier).writeServerCertification(data);
-      return data;
+Future<String?> updateCertificateIfExpired(String devicename) async {
+  try {
+    logger.i("updating the certificate");
 
-    } catch(e){
-      logger.e(e);
-      rethrow;
-    }
-    
+   
+    final keyPEM =
+        await ref.read(secureStorageProvider.notifier).readServerSecretKey();
+    if (keyPEM == null) return null;
+
+    final data = await Isolate.run(() {
+      final prvtKey = CryptoUtils.rsaPrivateKeyFromPem(keyPEM);
+      final publicKey = RSAPublicKey(
+        prvtKey.modulus!,
+        prvtKey.publicExponent ?? BigInt.from(65537),
+      );
+      final csr = X509Utils.generateRsaCsrPem(
+        {'CN': devicename},
+        prvtKey,
+        publicKey,
+      );
+      return X509Utils.generateSelfSignedCertificate(prvtKey, csr, 1);
+    });
+
+    logger.i("Generated a New crt ! writing it locally...");
+    await ref.read(secureStorageProvider.notifier).writeServerCertification(data);
+    return data;
+  } catch (e) {
+    logger.e(e);
+    rethrow;
   }
-
+}
   @override
   bool isExpiringSoon(String cert, {required int withinHour}) {
     logger.i("Checking if the certificate about to expire in $withinHour hour");

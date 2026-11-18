@@ -48,10 +48,10 @@ import 'package:logger/logger.dart';
 /// 
 /// A trade-off of this deletion model is that if a user accidentally adds the wrong
 /// media to the wrong course, deleting it only removes it from the current device.
-/// They would need to delete it again on every other linked device, and on any future
-/// device connected to the account. As a future feature, we could introduce two delete
-/// types: soft delete (removes it only from the current device, today's behavior) and
-/// hard delete (removes it everywhere: the cloud and every synced device). for now
+/// They would need to delete it again on every other linked device.
+/// As a future feature, we could introduce two delete
+/// types: soft delete (removes it only from the current device + fire store, today's behavior) and
+/// hard delete (removes it everywhere: every synced device). for now
 /// and for the very first version of the software , we will have only the soft delete feature
 
 

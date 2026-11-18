@@ -1,25 +1,18 @@
-// ignore_for_file: avoid_print
-
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/presentation/widgets/receiving_files_d2d_sheet.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/services/ClientSide/device_to_device_service.dart';
-import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/services/ServerSide/server_side_service.dart';
 import 'package:flutterfrontenduniprojectmanager/router/router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-class ScanQrCodeSheet extends ConsumerStatefulWidget {
+class ScanQrCodeSheetd2dDifferentAccount extends ConsumerStatefulWidget {
   
-
-  final List<MediaForm> media; 
   static bool _isOpen = false;
 
-  const ScanQrCodeSheet({super.key , required this.media});
+  const ScanQrCodeSheetd2dDifferentAccount({super.key});
 
 
-  static Future<String?> showSheet(List<MediaForm> media) async {
+  static Future<String?> showSheet() async {
     if (_isOpen) return null;
 
     final ctx = navigatorKey.currentContext;
@@ -33,7 +26,7 @@ class ScanQrCodeSheet extends ConsumerStatefulWidget {
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
         barrierColor: Colors.black.withValues(alpha: 0.3),
-        builder: (_) => ScanQrCodeSheet(media: media,),
+        builder: (_) => ScanQrCodeSheetd2dDifferentAccount(),
       );
     } finally {
       _isOpen = false;
@@ -41,10 +34,10 @@ class ScanQrCodeSheet extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<ScanQrCodeSheet> createState() => _ScanQrCodeSheetState();
+  ConsumerState<ScanQrCodeSheetd2dDifferentAccount> createState() => _ScanQrCodeSheetState();
 }
 
-class _ScanQrCodeSheetState extends ConsumerState<ScanQrCodeSheet> {
+class _ScanQrCodeSheetState extends ConsumerState<ScanQrCodeSheetd2dDifferentAccount> {
   final MobileScannerController _controller = MobileScannerController(
     formats: [BarcodeFormat.qrCode],
     detectionSpeed: DetectionSpeed.noDuplicates,
@@ -55,19 +48,14 @@ class _ScanQrCodeSheetState extends ConsumerState<ScanQrCodeSheet> {
     if (_closed) return;
     final raw = capture.barcodes.firstOrNull?.rawValue;
     if (raw == null) return;
-    _closeSheet();
-    ReceivingFilesD2dSheet.show(
-      rawQrCode: raw,
-      media: widget.media
-    );
-
+    _closeSheet(raw);
     
   }
 
-  void _closeSheet() {
+  void _closeSheet(String? rawQrCodejson) {
     if (_closed || !mounted) return;
     _closed = true;
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(rawQrCodejson);
   }
 
   @override
@@ -146,7 +134,7 @@ class _ScanQrCodeSheetState extends ConsumerState<ScanQrCodeSheet> {
                   ),
                    const SizedBox(height: 4),
                   TextButton(
-                    onPressed: _closeSheet,
+                    onPressed: ()=>_closeSheet(null),
                     child: const Text('Cancel'),
                   ),
                 ],

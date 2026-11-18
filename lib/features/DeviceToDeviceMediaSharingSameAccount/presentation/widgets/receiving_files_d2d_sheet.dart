@@ -180,17 +180,6 @@ Text(
       : 'Preparing...',
   style: Theme.of(context).textTheme.titleMedium,
 ),
-const SizedBox(height: 16),
- 
-                  TextButton(
-                    onPressed: () async {
-                     
-                      _closed = true; 
-                      Navigator.of(context).pop();
-                      ref.read(clientSideCurrentStateProvider.notifier).changeCurrentState(ClientSideD2DState.aborted);
-                    },
-                    child: const Text('Cancel'),
-                  ),
 
                   const SizedBox(height: 12),
                   

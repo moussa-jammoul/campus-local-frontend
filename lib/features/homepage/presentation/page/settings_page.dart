@@ -2,12 +2,14 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/presentation/widgets/mobile_qr_code_scanner_d2d_same_account.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/current_account_linked_tile.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/fetch_any_missed_media_button.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/light_dark_mode_switcher.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/linked_accounts.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/logout_tile.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/open_connection_to_send_media.dart';
+import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/scan_qr_code_to_download_media_tile.dart';
 
 const double kSettingsWidth = 320;
 
@@ -60,8 +62,9 @@ class SettingsPage extends ConsumerWidget {
               children: const [
                 
                 LinkedAccountsTiles(),
-
+      
                 FetshAnyMissedMediaButton(),
+                ScanQrCodeToDownloadMediaTile(),
 
                 OpenConnectionToSendMedia(),
 

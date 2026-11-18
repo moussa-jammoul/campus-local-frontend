@@ -2,11 +2,13 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/server/RequestRouter/current_process_type.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/server_set_up.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/ServerSetup/timer_helper.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/approvable_source.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/current_server_state.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/providers/qrcode_current_data.dart';
+import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/widgets/in_process_sheet.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/presentation/providers/number_files_left.dart';
 
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/presentation/widgets/in_process_d2d_sheet.dart';
@@ -160,7 +162,11 @@ class _QrCodeSheetState extends ConsumerState<QrCodeSheet> {
          }
          ref.read(approvableSourceProvider.notifier).approveSource();
         //synchronized with closure of the QR code sheet
-        InProcessD2dSheet.show();     
+        final type = await ref.read(currentServerProcessTypeProvider.notifier).waitForCurrentProcessType();
+        if(type == ProcessType.d2dSameAccount) {
+          InProcessD2dSheet.show();
+    
+        } else if(type == ProcessType.d2dDifferentAccount){ InProcessD2dWaitingSheetDifferentAccount.show();}     
        } else if((previous == null || previous == ServerStates.waitingToScanQrCode || previous == ServerStates.starting) 
        && (next == ServerStates.terminated || next == ServerStates.stopping)
        ){

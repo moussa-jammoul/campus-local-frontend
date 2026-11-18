@@ -16,6 +16,7 @@ import 'package:video_thumbnail/video_thumbnail.dart';
 
 ///relative path for any media is : user/<-userUuid->/course/<-courseUuid->/media/<-mediauuid->.fileExtention
 ///for video thumbnail is : thumbnail/<-mediauuid->.fileExtention
+///
 
 
 
@@ -31,15 +32,17 @@ class MediaManagment extends Notifier<void> {
   Future<File> _resolveMediaFile(String relativePath) async{
     final appDocDir = await getApplicationDocumentsDirectory();
     return File(p.join(appDocDir.path, relativePath));
-  }
+  } 
 
-
-
- Future<void> streamBytesLocally({
+ Future<SavedMediaFileInfo> streamBytesLocally({
   required Stream<Uint8List> stream,
-  required MediaForm media,
+  required String userUid,
+  required String courseUuid,
+  required String mediaUuid,         
+  required String fileExtension,  
+  
 }) async {
-  final relativePath = p.join('user', media.userUid, 'course', media.courseUuid, 'media', '${media.uuid!}.${media.filetype}');
+  final relativePath = p.join('user', userUid, 'course', courseUuid, 'media', '$mediaUuid.$fileExtension');
   logger.i('Saving media file: ${media.uuid!}.${media.filetype}');
   
   bool mediaFullBytesSucces = false;
@@ -58,12 +61,6 @@ class MediaManagment extends Notifier<void> {
       if (received >= 1024 * 1024) { // each 1 MB , flush it
         await sink.flush();
         received = 0; 
-        //this is how we abort the process when the process already send a request 
-        //and abort clicked by the user
-        if(ref.read(clientSideCurrentStateProvider) == ClientSideD2DState.aborted){
-          
-          return;
-        }
       }
 
     }
@@ -72,7 +69,7 @@ class MediaManagment extends Notifier<void> {
     await ref.read(writeMediaProvider.notifier).labelMediaAvailableLocallyTrue(media.id!);
   } finally {
     await sink.close();
-    if(mediaFullBytesSucces){
+    if(mediaFullBytesSucces && mediaVideoFormats.contains(media.filetype)){
     unawaited(_createVideoThumbnail(media.filepath , media.uuid!));
     }
     

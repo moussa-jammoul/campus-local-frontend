@@ -192,7 +192,7 @@ class FileTile extends ConsumerWidget {
   
   
   if (!context.mounted) return;   
-  final bool mediaExistLocally = mediaItem.mediaExistLocally ?? true; //null not possible , because always the data base init it , and we re-read the inserted data , so we will consider it as true if somehow it read the state directly
+  final bool mediaExistLocally = mediaItem.mediaExistLocally ?? false; //null not possible , because always the data base init it , and we re-read the inserted data , so we will consider it as true if somehow it read the state directly
    
   if (path == null || !mediaExistLocally ) {
     _showMessage(
