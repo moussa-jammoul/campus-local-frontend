@@ -149,6 +149,7 @@ class _ImageGridBody extends ConsumerWidget {
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
           childAspectRatio: 1, 
+          mainAxisExtent: 140
         ),
         itemCount: mediaList.length,
         
@@ -214,44 +215,55 @@ class _ImageTileState extends ConsumerState<ImageTile> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final bool mediaExistLocally = widget.mediaItem.mediaExistLocally ?? true; //null not possible , because always the data base init it , and we re-read the inserted data , so we will consider it as true if somehow it read the state directly
+Widget build(BuildContext context) {
+  final scheme = Theme.of(context).colorScheme;
+  final bool mediaExistLocally = widget.mediaItem.mediaExistLocally ?? true; //null not possible , because always the data base init it , and we re-read the inserted data , so we will consider it as true if somehow it read the state directly
 
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: scheme.outlineVariant.withValues(alpha: 0.3),
+  return GestureDetector(
+    onTap: () {
+      context.push('/home/courses/${widget.mediaItem.courseUuid}/images/image/${widget.mediaItem.uuid}' , 
+      extra: ImageRouteData(bytes: byte, imageDetail: widget.mediaItem)
+      );
+    },
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          child: Container(
+            clipBehavior: Clip.antiAlias, 
+            decoration: BoxDecoration(
+              color: scheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: scheme.outlineVariant.withValues(alpha: 0.3),
+              ),
+            ),
+            child: byte == null || !mediaExistLocally
+                ? Center(
+                    child: Icon(
+                      Icons.image_rounded,
+                      size: 32,
+                      color: scheme.onSurfaceVariant.withValues(alpha: 0.5),
+                    ),
+                  )
+                : Image.memory(
+                    byte!,
+                    fit: BoxFit.cover,
+                    cacheWidth: 300,
+                    gaplessPlayback: true,
+                  ),
+          ),
         ),
-      ),
-      child:
-       GestureDetector(
-        onTap: () {
-          context.push('/home/courses/${widget.mediaItem.courseUuid}/images/image/${widget.mediaItem.uuid}' , 
-          extra: ImageRouteData(bytes: byte, imageDetail: widget.mediaItem)
-          );
-        },
-        child:
-       byte == null || !mediaExistLocally ? Center(
-        child: Icon(
-          Icons.image_rounded,
-          size: 32,
-          color: scheme.onSurfaceVariant.withValues(alpha: 0.5),
+        const SizedBox(height: 6),
+        Text(
+          widget.mediaItem.filename,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
-      
-      ) 
-      : 
-     
-      Image.memory(
-  byte!,
-  fit: BoxFit.cover,
-  cacheWidth: 300,         
-  gaplessPlayback: true,    
-)
-       )
-      
-    );
-  }
+      ],
+    ),
+  );
+}
 }

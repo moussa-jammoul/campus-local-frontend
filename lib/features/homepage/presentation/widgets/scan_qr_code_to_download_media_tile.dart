@@ -66,7 +66,7 @@ class ScanQrCodeToDownloadMediaTile extends ConsumerWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'To download any media from any device , open a secure connection in the device that hold the media , then click here to scan the qr code generated and it will automatically download the media.',
+                 'Open a secure connection on the device that holds the media, then tap here to scan its QR code. The download starts automatically.',
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.grey[600],

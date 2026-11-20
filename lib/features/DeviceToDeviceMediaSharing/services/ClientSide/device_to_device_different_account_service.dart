@@ -41,7 +41,7 @@ class DeviceToDeviceDifferentAccountService extends Notifier<void> implements De
     logger.i('extractDataFromQRCODE: parsed, target ${data.ip}:${data.port}');
     return data;
     } catch(e){
-      logger.i('extractDataFromQRCODE: failed to parse the QR data');
+      logger.e('extractDataFromQRCODE: failed to parse the QR data');
       logger.e(e);
       throw "Failed to Scan the Qr code, it's either wrong one , or internal error cause it";  
     }
@@ -83,41 +83,43 @@ class DeviceToDeviceDifferentAccountService extends Notifier<void> implements De
        final userUid = FirebaseAuth.instance.currentUser?.uid;
        if(userUid == null){
         logger.i('sendReqAndstreamReceivedDataLocally:uid of the user is null');
-        throw "Failed to Grab a Media";
+        throw "Failed to Grab a Media Because user uid is null";
 
        }
        
       
 
        final generatedUUID = const Uuid().v7();
-       logger.e(generatedUUID);
+       logger.i('sendReqAndstreamReceivedDataLocally: stream received, writing to disk');
+       final mediaSaved =  await ref.read(mediaManagmentProvider.notifier).streamBytesLocally(
+        stream: stream, 
+        userUid:userUid, 
+        courseUuid: path.courseUuid, 
+        mediaUuid: generatedUUID, 
+        fileExtension: headersData.fileType, 
+        );
+        logger.i("media saved : $mediaSaved");
+        if(mediaSaved == null) throw "failed to save media locally";
+      
        final mediaToBesaved = MediaForm(
         uuid: generatedUUID,
         userUid: userUid, 
         courseUuid: path.courseUuid, 
         filename:headersData.fileName ,
         fileDescription: headersData.fileDescription ,
-         filepath: join('user', userUid, 'course', path.courseUuid, 'media', '$generatedUUID.${headersData.fileType}'), 
-         filetype: headersData.fileType, 
-         filesizeByte: headersData.fileSizeByte, 
+         filepath: mediaSaved.relativePath, 
+         filetype: mediaSaved.fileType, 
+         filesizeByte:mediaSaved.fileSizeByte, 
          isFavorite: false
          );
          
-         //one trade off about this model that if the user was in the process , then error happened , the media metadata will still
-         //there.
-         final inserted =await ref.read(writeMediaProvider.notifier).addData(mediaToBesaved, false);
-         logger.e(inserted.uuid);
-
+         final inserted =await ref.read(writeMediaProvider.notifier).addData(mediaToBesaved, true);
          //add to the cloud
          unawaited(
           ref.read(mediaCloudProvider.notifier).addNewMedia(inserted)
          );
     
-        logger.i('sendReqAndstreamReceivedDataLocally: stream received, writing to disk');
-        await ref.read(mediaManagmentProvider.notifier).streamBytesLocally(
-        stream: stream, 
-        media: inserted
-        );
+        
     } catch(e){
       rethrow;
     }
@@ -168,7 +170,7 @@ class DeviceToDeviceDifferentAccountService extends Notifier<void> implements De
       );
     logger.i('startProcess: request finished');
     } catch(e){
-      logger.i('startProcess: failed');
+      logger.e('startProcess: failed');
       logger.e(e);
       rethrow;
     } finally{

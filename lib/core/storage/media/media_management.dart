@@ -11,7 +11,8 @@ import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSha
 import 'package:logger/web.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:video_thumbnail_gen/video_thumbnail_gen.dart';
+
 
 
 ///relative path for any media is : user/<-userUuid->/course/<-courseUuid->/media/<-mediauuid->.fileExtention
@@ -34,16 +35,16 @@ class MediaManagment extends Notifier<void> {
     return File(p.join(appDocDir.path, relativePath));
   } 
 
- Future<SavedMediaFileInfo> streamBytesLocally({
+ Future<SavedMediaFileInfo?> streamBytesLocally({
   required Stream<Uint8List> stream,
   required String userUid,
   required String courseUuid,
   required String mediaUuid,         
-  required String fileExtension,  
+  required String fileExtension, 
   
 }) async {
   final relativePath = p.join('user', userUid, 'course', courseUuid, 'media', '$mediaUuid.$fileExtension');
-  logger.i('Saving media file: ${media.uuid!}.${media.filetype}');
+  logger.i('Saving media file: $mediaUuid.$fileExtension , relative path: $relativePath');
   
   bool mediaFullBytesSucces = false;
 
@@ -64,15 +65,30 @@ class MediaManagment extends Notifier<void> {
       }
 
     }
-    mediaFullBytesSucces = true;
 
-    await ref.read(writeMediaProvider.notifier).labelMediaAvailableLocallyTrue(media.id!);
+    final fileLengthWritedByte = await file.length();
+    logger.i("recieved size : $fileLengthWritedByte");
+    mediaFullBytesSucces = true;
+    
+  
+    return SavedMediaFileInfo(
+      relativePath: relativePath, 
+      fileSizeByte:fileLengthWritedByte, 
+      fileType: fileExtension,
+    );
+  } catch(e){
+    logger.e(e);
+    logger.e("deleting the file data after the fail to write the entire file ....");
+    await file.delete();
+    return null;
   } finally {
     await sink.close();
-    if(mediaFullBytesSucces && mediaVideoFormats.contains(media.filetype)){
-    unawaited(_createVideoThumbnail(media.filepath , media.uuid!));
+    if(mediaFullBytesSucces && mediaVideoFormats.contains(fileExtension)){
+    unawaited(_createVideoThumbnail(relativePath , mediaUuid));
+    } else if(!mediaFullBytesSucces){
+      logger.e("deleting the file data after the fail to write the entire file ....");
+      await file.delete();
     }
-    
   }
 
   
@@ -196,11 +212,9 @@ class MediaManagment extends Notifier<void> {
     );
     
 
-    ///we don't want to wait thumbnail creation , or it will took long
-    ///to return savedInfo , the trade - off that the user will not see at first
-    ///thumbnail for the video , until next request where the thumbnail is done
     
-    unawaited(_createVideoThumbnail(savedInfo.relativePath , mediaUuid));
+    
+    await _createVideoThumbnail(savedInfo.relativePath , mediaUuid);
 
     return savedInfo;
     } catch (e, st) {

@@ -76,7 +76,7 @@ class _QrCodeSheetState extends ConsumerState<QrCodeSheet> {
     final scheme = theme.colorScheme;
 
     return PopScope(
-      canPop: false, // the back button must not close it, only the two buttons
+      canPop: false, 
       child: Dialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -222,7 +222,7 @@ class _QrCodeSheetState extends ConsumerState<QrCodeSheet> {
                   const SizedBox(height: 8),
                   Text(
                    'Scan this QR code with the device that needs the media. '
-                   'Both devices must be on the same Wi-Fi network.',
+                   'Both devices must be on the same Wi-Fi network(or hotspot).',
                     
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -231,7 +231,6 @@ class _QrCodeSheetState extends ConsumerState<QrCodeSheet> {
                   ),
                   const SizedBox(height: 20),
 
-                  // QR area: loading / QR / error
                   SizedBox(
                     width: 260,
                     height: 260,

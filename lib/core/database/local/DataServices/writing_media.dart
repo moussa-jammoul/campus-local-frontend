@@ -36,7 +36,7 @@ class WritingMedia extends Notifier<void> {
     int limit,
     int alreadyRead,
     List<String>? fileextention,
-    bool isFav
+    bool isFav,
   ) async {
     if (db != null) {
       logger.i(
@@ -53,7 +53,8 @@ class WritingMedia extends Notifier<void> {
     t.userUid.equals(userUid) &
     t.courseUuid.equals(courseUuid) &
     t.fileType.isIn(fileextention) &
-    (isFav ? t.isFavorite.equals(true) : const Constant(true)) //no fallback if no favorite
+    (isFav ? t.isFavorite.equals(true) : const Constant(true))  //no fallback if no favorite
+
     ) 
               ..orderBy([
                 (t) => OrderingTerm.desc(t.createdAt),

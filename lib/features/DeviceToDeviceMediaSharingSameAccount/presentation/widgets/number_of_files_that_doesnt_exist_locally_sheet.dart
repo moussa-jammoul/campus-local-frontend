@@ -182,7 +182,7 @@ class _NumberOfFilesThatDoesntExistLocallySheetState
                         Expanded(
                           child: Text(
                             'Make sure the secure connection is open on the other device, '
-                            'and that both devices are connected to the same Wi-Fi network (or mobile data with hotspot).',
+                            'and that both devices are connected to the same Wi-Fi network (or hotspot).',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: scheme.onSurface.withValues(alpha: 0.8),
                             ),

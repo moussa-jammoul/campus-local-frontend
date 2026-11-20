@@ -10,14 +10,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
-///TODO missing in the app : 
-///fix that the sending files wait until the user choose a file ! just change where we change the state of it
-///also i should render only the media available 
-///test the d2d different account sharing
-///fix the readme and make it up to date
-///1-sending media between two different accounts
-///change the video thumbnail package to a newer one
-
 
 final GoogleSignIn googleSignIn = GoogleSignIn.instance;
 
@@ -29,7 +21,7 @@ void main() async {
   await Firebase.initializeApp(); //insuring firebase initialization
   
 
-  ///fetching theme mode set by user or null so we use the system of his device
+  ///fetching theme mode set by user , if  we use the system of his device
   final prefs = await SharedPreferences.getInstance();
   final isDark = prefs.getBool(isDarkKey); // null if never set
   final initialThemeMode =

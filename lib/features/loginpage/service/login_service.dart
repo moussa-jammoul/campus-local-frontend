@@ -78,12 +78,12 @@ class LoginService extends Notifier<void> implements LoginServiceDomain {
     ref.read(emailPasswordErrorsProvider.notifier).removeError();
     final cred = await ref.read(loginApiProvider.notifier).signIn(email, password);
     if(cred == null){
-      ref.read(createAccountErrorsProvider.notifier).customError('An error occurred while signing in. The email may not exist as a user, or you may have lost connection while signing in. Please try again later.');
+      ref.read(emailPasswordErrorsProvider.notifier).customError('An error occurred while signing in. The email may not exist as a user, or you may have lost connection while signing in. Please try again later.');
       return ;
     }
 
     } catch(e){
-      ref.read(createAccountErrorsProvider.notifier).customError('An error occurred while signing in. The email may not exist as a user, or you may have lost connection while signing in. Please try again later.');
+      ref.read(emailPasswordErrorsProvider.notifier).customError('An error occurred while signing in. The email may not exist as a user, or you may have lost connection while signing in. Please try again later.');
       logger.e(e);
       rethrow;
     } finally{

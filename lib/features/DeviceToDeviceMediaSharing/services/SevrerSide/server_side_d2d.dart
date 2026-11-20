@@ -81,7 +81,6 @@ Future<void> sendFile(HttpRequest req) async {
       ..headers.add('media-extension', Uri.encodeComponent(media.filetype))
       ..headers.add('media-name', Uri.encodeComponent(media.filename))
       ..headers.add('media-description', Uri.encodeComponent(media.fileDescription ?? "A Media"))
-      ..headers.add('media-size', media.filesizeByte)
       ..contentLength = length;
     logger.i('_sendFile: headers ready, streaming the file to the receiver');
     await req.response.addStream(file.openRead());

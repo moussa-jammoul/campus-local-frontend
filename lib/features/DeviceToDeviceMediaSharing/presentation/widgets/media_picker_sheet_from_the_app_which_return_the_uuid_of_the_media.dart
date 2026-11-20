@@ -124,11 +124,17 @@ class _MediaPickerGridState extends ConsumerState<MediaPickerGrid> {
   @override
   Widget build(BuildContext context) {
     final List<MediaForm>? mediaList = ref.watch(mediaProvider);
+    final filteredMedia = mediaList?.where((media){
+      if(media.mediaExistLocally != null && media.mediaExistLocally == false){
+        return false;
+      } 
+      return true;
+    }).toList();
 
-    if (mediaList == null) {
+    if (filteredMedia == null) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (mediaList.isEmpty) {
+    if (filteredMedia.isEmpty) {
       return const Center(child: Text('No media'));
     }
 
@@ -141,9 +147,9 @@ class _MediaPickerGridState extends ConsumerState<MediaPickerGrid> {
         crossAxisSpacing: 12,
         childAspectRatio: 0.8, 
       ),
-      itemCount: mediaList.length,
+      itemCount: filteredMedia.length,
       itemBuilder: (context, i) {
-        final media = mediaList[i];
+        final media = filteredMedia[i];
         return _PickerTile(
           key: ValueKey(media.id),
           media: media,

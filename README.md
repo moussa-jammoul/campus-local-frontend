@@ -4,7 +4,7 @@ A new project ,"Campus Local", built for Lebanese university students. Free and 
 
 ## Quick Notes
 
-The project architecture is local-first: the app is designed to manage a student's university life fully offline (aside from logging in), with the local database as the source of truth. The parts we sync to the external cloud are: deadlines, user data (and device tokens), courses, semesters, and media metadata (not the media itself).
+The project architecture is local-first: the app is designed to manage a student's university life fully offline (aside from logging in), with the local database as the source of truth. The parts we sync to the external cloud are: user data (and device tokens), courses, semesters, and media metadata (not the media itself).
 
 ### Sync strategy
 
@@ -16,12 +16,13 @@ Note: the project is flexible enough to swap Firestore for a different cloud dat
 
 ### Media handling
 
-On the media side, we only store the logical path (e.g. `/semester1/m1101/{media_id}`) of a given media file in the DB , the actual file lives in the local sandboxed storage of the application. **There is no real media file syncing to the server DB** , media metadata syncs like any other table, but the file bytes never touch the server.
+On the media side, we only store the logical path (e.g. `/uuid/semester1/uuid/m1101/uuid/{media_id}`) of a given media file in the DB , the actual file lives in the local sandboxed storage of the application. **There is no real media file syncing to the server DB** , media metadata syncs like any other table, but the file bytes never touch the server.
 
-For multi-device support, the app relies on direct device-to-device transfer over the same LAN/WiFi network: the device holding the file starts a local HTTPS server (self-signed certificate) and advertises itself via mDNS (multicast DNS); the device missing the file discovers it, pairs using a one-time-session PIN, and requests the missing files individually over HTTPS. Never rely on the application as "cloud storage" , it is local-first and device-synced only.
+For multi-device support, the app relies on direct device-to-device transfer over the same LAN/WiFi network: the device holding the file starts a local HTTPS server (self-signed certificate) and generate a qr code holding necessary pairing details like ip address , generated token ... , the device missing the file discovers it, pairs with the server, and requests the missing files individually over HTTPS. Never rely on the application as "cloud storage" , it is local-first and device-synced only.
 
-The project also support sending medias between devices over the LAN/WIFI network if two different account , 
-that mean you can share any file you want with any freind any Time you Want with the fastest possible way !
+The project also supports direct device-to-device transform media with two different accounts , same methodology of
+the "d2d same account" , the client side chooses where the media should sit in the application , the server side chooses
+what media to send.
 
 
 ## For developers
@@ -33,6 +34,7 @@ that mean you can share any file you want with any freind any Time you Want with
 3. Set up your own Firebase project, and add your config files and Firestore security rules.
 4. Run the app , platform plugin files will be generated automatically on first run.
 
+TODO : remove this
 ### Known build issue: `video_thumbnail` (Android)
 
 The project uses the `video_thumbnail` package, which is no longer maintained. Its Android build files use outdated settings, so the first `flutter run` may fail with errors like `Could not find method jcenter()` or `:video_thumbnail:checkDebugAarMetadata`.

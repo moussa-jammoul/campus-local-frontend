@@ -186,7 +186,7 @@ class ServerSetUp extends Notifier<void> implements ServerSetUpDomain {
     ref.read(timerHelperProvider.notifier).startTimer(stopProcess, seconds: firstScanSeconds);
 
    
-    logger.i("data :$port , $token , $ip ");
+    
     ref.read(currentServerStateProvider.notifier).changeCurrentState(ServerStates.waitingToScanQrCode);
 
     return ProcessStartReturn(jsonQRcodeData: jsonQRcodeData );

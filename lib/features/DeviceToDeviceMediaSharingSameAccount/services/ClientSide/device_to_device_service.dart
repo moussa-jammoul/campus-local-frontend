@@ -147,10 +147,18 @@ class DeviceToDeviceService extends Notifier<void> implements DeviceToDeviceServ
        //one trade off about it that if the fail is repetetive , and the user have lots of files requesting , user should wait until all of them fails
        //(note that not every error is skipped , some errors like failed to reach the endpoint(if by example the user aborted the server) close the whole process)
        logger.i('sendReqAndstreamReceivedDataLocally: stream received for ${mediaInfo.uuid}, writing to disk');
-       await ref.read(mediaManagmentProvider.notifier).streamBytesLocally(
-        stream: stream, 
-        media: mediaInfo
+       final savedInfo = await ref.read(mediaManagmentProvider.notifier).streamBytesLocally(
+        stream: stream,
+        userUid: mediaInfo.userUid,
+        courseUuid: mediaInfo.courseUuid,
+        mediaUuid: mediaInfo.uuid!,
+        fileExtension: mediaInfo.filetype, 
         );
+        logger.i("saved the media : $savedInfo");
+        if(savedInfo != null){
+          logger.i("labeling media as exist locally");
+          ref.read(writeMediaProvider.notifier).labelMediaAvailableLocallyTrue(mediaInfo.id!);
+        }
        logger.i('sendReqAndstreamReceivedDataLocally: write started for ${mediaInfo.uuid}');
     } catch(e){
       rethrow;

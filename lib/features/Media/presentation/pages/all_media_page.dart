@@ -184,7 +184,8 @@ class _AllMediaPageState extends ConsumerState<AllMediaPage> {
               maxCrossAxisExtent: 140,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          childAspectRatio: 1, 
+          childAspectRatio: 1,
+          mainAxisExtent: 140 
              
             ),
             delegate: SliverChildBuilderDelegate(
