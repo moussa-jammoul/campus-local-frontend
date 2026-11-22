@@ -42,7 +42,7 @@ The project also supports direct device-to-device (D2D) media transfers between 
 
 ## License
 
-Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussajammoul/campuslocal)
+Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussajammoul/campus-local-frontend)
 
 This project is licensed under the **[PolyForm Noncommercial License 1.0.0](LICENSE.md)**.
 
