@@ -8,6 +8,10 @@
 
 The project architecture is local-first: the app is designed to manage a student's university life fully offline (aside from logging in), with the local database as the source of truth. The parts we sync to the external cloud are: user data (and device tokens), courses, semesters, and media metadata (not the media itself).
 
+## Download
+
+Download the latest Android APK from the **[Releases Page](https://github.com/moussa-jammoul/campus-local-frontend/releases/latest)**.
+
 ### Sync strategy
 
 Since the app works offline-first across multiple devices, it's worth understanding how Firestore supports this approach.
