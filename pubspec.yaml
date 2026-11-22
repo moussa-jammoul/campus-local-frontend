@@ -78,6 +78,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   drift_dev: ^2.20.0     
   build_runner: ^2.4.0 
+  flutter_launcher_icons: ^0.14.4
 flutter:
 
   # The following line ensures that the Material Icons font is
@@ -115,3 +116,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icons/logoApp.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icons/logoApp.png"

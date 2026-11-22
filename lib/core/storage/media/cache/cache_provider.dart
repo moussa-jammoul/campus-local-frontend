@@ -5,7 +5,9 @@ import 'package:flutterfrontenduniprojectmanager/core/storage/media/cache/form.d
 import 'package:flutterfrontenduniprojectmanager/core/storage/media/media_management.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
-
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
 ///cache managment cache images and videos thumbnail , with a max limit for each,
 ///(note that this message i write it assuming that we still use flutter gird tiles ui , to render the images) 
 ///when i tile born  , from init we call cache image , which check following stuff

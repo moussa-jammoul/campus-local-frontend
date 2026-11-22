@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
-
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/server/constantversions.dart';
@@ -8,14 +10,7 @@ import 'package:flutterfrontenduniprojectmanager/core/server/qrCode/qrcode_servi
 import 'package:logger/logger.dart';
 
 
-///this class is the base of any other qr code generator related to the server start up , 
-///whenever you want to add extra data to the qr code  , override the generator, something like
-/// .... extend QrcodeService {
-/// @override
-/// ....
-/// }
-/// or if no need to extra stuff but the base , use this service directly via
-/// generate qr pay load
+
 
 
 

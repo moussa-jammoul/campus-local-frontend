@@ -1,3 +1,9 @@
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussajammoul/campuslocal)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
+
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,9 +28,10 @@ class RefreshListenAbleRouterNotifier extends ChangeNotifier {
   //note that email verification should have a manual button to call firebase auth reload , "so email verification actually change and we get notifie"
   User? pre;//used to compare between old user and new user to check for changes
   bool hasRunFirstVerifiedLogin = false;
+  late StreamSubscription _sub;
 
 void _listenToUserState(Ref ref) {
-  FirebaseAuth.instance.userChanges().listen((user) async {
+  _sub = FirebaseAuth.instance.userChanges().listen((user) async {
     logger.i('userChanges fired : email : ${user?.email} , is verified : ${user?.emailVerified}', time: DateTime.now());
 
     if (user != null) {
@@ -43,8 +50,11 @@ void _listenToUserState(Ref ref) {
       pre = null;
       hasRunFirstVerifiedLogin = false;
     }
-
+    if (!ref.mounted) return;
     notifyListeners();
   });
+
+  ref.onDispose(_sub.cancel);
+  
 }
 }

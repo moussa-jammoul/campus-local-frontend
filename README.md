@@ -1,6 +1,8 @@
 # Campus Local
 
-A new project ,"Campus Local", built for Lebanese university students. Free and open-source, with a fast and interactive UI. A local-first application to manage students' semesters, courses, media (videos, images, files), deadlines, and calendars, synced with the Firestore cloud service.
+"Campus Local", a project built for Lebanese university students. Free and open-source, with a fast and interactive UI. A local-first application to manage students' semesters, courses, media (videos, images, files), synced with the Firestore cloud service.
+
+
 
 ## Quick Notes
 
@@ -20,9 +22,7 @@ On the media side, we only store the logical path (e.g. `/uuid/semester1/uuid/m1
 
 For multi-device support, the app relies on direct device-to-device transfer over the same LAN/WiFi network: the device holding the file starts a local HTTPS server (self-signed certificate) and generate a qr code holding necessary pairing details like ip address , generated token ... , the device missing the file discovers it, pairs with the server, and requests the missing files individually over HTTPS. Never rely on the application as "cloud storage" , it is local-first and device-synced only.
 
-The project also supports direct device-to-device transform media with two different accounts , same methodology of
-the "d2d same account" , the client side chooses where the media should sit in the application , the server side chooses
-what media to send.
+The project also supports direct device-to-device (D2D) media transfers between two different accounts, following the same methodology as 'D2D same-account' transfers. In this setup, the client determines where the media is stored within the application, while the server decides which media to send.
 
 
 ## For developers
@@ -34,21 +34,17 @@ what media to send.
 3. Set up your own Firebase project, and add your config files and Firestore security rules.
 4. Run the app , platform plugin files will be generated automatically on first run.
 
-TODO : remove this
-### Known build issue: `video_thumbnail` (Android)
-
-The project uses the `video_thumbnail` package, which is no longer maintained. Its Android build files use outdated settings, so the first `flutter run` may fail with errors like `Could not find method jcenter()` or `:video_thumbnail:checkDebugAarMetadata`.
-
-To fix it, open the package's Gradle file in your pub cache (on Windows: `%LOCALAPPDATA%\Pub\Cache\hosted\pub.dev\video_thumbnail-0.5.6\android\build.gradle`) and make two changes:
-
-1. Replace both `jcenter()` entries with `mavenCentral()`.
-2. Raise `compileSdkVersion` to match your Flutter project (for example `36`).
-
-Then run `flutter clean` and `flutter run` again.
-
-> These edits live in your local pub cache, so they are lost if the cache is repaired or the package is redownloaded. A permanent fix (replacing the package with a maintained alternative) is planned.
-
 
 ### System designs and choices
 
-> To understand the full sync and media-transfer design (diagrams, edge cases, and reasoning), and the database tables, developers can download **uniProjectDB.drawio** (not ready yet) from the repo and open it via draw.io.
+> To understand the full sync and media-transfer design , which explain trade-off taken and system architecture , please go to (system_architecture_engineering_decisions.md)
+
+
+## License
+
+Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussajammoul/campuslocal)
+
+This project is licensed under the **[PolyForm Noncommercial License 1.0.0](LICENSE.md)**.
+
+* **Permitted:** You are free to view, fork, modify, and use this software for personal, educational, research, and other non-commercial purposes.
+* **Prohibited:** Commercial use, resale, paid distribution, or deploying this software as part of a commercial product or service is strictly prohibited without explicit written permission from the copyright holder.

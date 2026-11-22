@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/semester_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/widgets/sheet_widgets.dart';
-
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
 
 class SheetSemestersPage extends ConsumerWidget {
   final ValueChanged<Semester> onSemesterSelected;

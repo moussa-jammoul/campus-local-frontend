@@ -1,9 +1,12 @@
 // ignore_for_file: unused_local_variable, body_might_complete_normally_nullable
-
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/courses_cloud_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/cloud/domain/semester_cloud_domain.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/all_devices_token_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/device_token_provider.dart';
@@ -13,6 +16,7 @@ import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/data/login_api_domain.dart';
 
 import 'package:flutterfrontenduniprojectmanager/main.dart';
+import 'package:flutterfrontenduniprojectmanager/router/router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
 
@@ -100,22 +104,13 @@ class LoginApiFirebase extends Notifier<void> implements LoginApiDomain {
   @override
   Future<void> logOut() async {
     try{
-      ///NOTE : here i implement logique in this data logique to prevent repeating the same invalidate 
-      ///providers each time accros any service side that log out , whenever you want to change the backend provider , please also add a 
-      ///invalidator to the providers , or you need to add in each log out service accros files invalidation logique
-    ref.invalidate(additionalDataFromLoginProvider);
-    ref.invalidate(deviceTokenProvider);
-    ref.invalidate(allDevicesTokenProvider);
-    ref.invalidate(semesterProvider);
+      
 
-    ///invalidating cloud providers because they have a listen functions to listen to
-    ///new db updates after sign in
-    ref.invalidate(semesterCloudProvider);
-    
-
-
-    //the actual sing out
     await FirebaseAuth.instance.signOut();
+
+    
+    final ctx = navigatorKey.currentContext;
+    if(ctx != null && ctx.mounted) Application.resetSessionScope(ctx);
 
     }catch(e){
       logger.e(e);

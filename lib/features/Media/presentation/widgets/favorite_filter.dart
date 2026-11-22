@@ -1,4 +1,6 @@
-
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
@@ -14,13 +16,13 @@ class CurrentFavState extends Notifier<bool>{
 
   void changestate(){
     final current = state;
-    print(current);
+    
     state = !current;
-    print(state);
+    
   }
   
 
-  //when adding a media , or exist the page , we should reset it
+  //when adding a media , or exit the page , we should reset it
   void resetToFalse(){
     state = false;
   }
@@ -50,7 +52,6 @@ class _FavoritesButtonState extends ConsumerState<FavoritesButton> {
       onTap: () async {
         ref.read(currentFavStateProvider.notifier).changestate();
         final isFav = ref.read(currentFavStateProvider);
-        print("the current state of is fav is $isFav");
         await ref.read(mediaServiceProvider.notifier).refreshDataLocally(widget.courseUuid, widget.types, isFav);
         
       },

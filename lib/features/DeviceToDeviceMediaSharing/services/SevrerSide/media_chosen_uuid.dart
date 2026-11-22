@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/widgets/media_picker_sheet_from_the_app_which_return_the_uuid_of_the_media.dart';
 import 'package:flutterfrontenduniprojectmanager/features/Media/presentation/pages/all_media_page.dart';
 import 'package:flutterfrontenduniprojectmanager/router/router.dart';
-
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
 //first open/closing principle practice
 
 abstract class IMediaPickingToSend{

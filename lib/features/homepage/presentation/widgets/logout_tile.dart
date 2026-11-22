@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/page/settings_page.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/service/home_page_services.dart';
-
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
 
 class LogoutButton extends ConsumerWidget {
   const LogoutButton({super.key});

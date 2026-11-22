@@ -1,3 +1,6 @@
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/DataServices/writing_user_data.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/userAdditionalData/additionalDataFromLogin/form.dart';
@@ -28,7 +31,8 @@ class AddionalDataFromLogin extends Notifier<UserAdditionalData?> {
   Future<void> readData(String uid) async {
     logger.i('reading additional data locally for uid: $uid');
     try {
-      state = await ref.read(writingUserDataProvider.notifier).readData(uid);
+      final newData =  await ref.read(writingUserDataProvider.notifier).readData(uid);
+      state = newData;
       logger.i('read result: $state');
     } catch (e) {
       logger.e(e);

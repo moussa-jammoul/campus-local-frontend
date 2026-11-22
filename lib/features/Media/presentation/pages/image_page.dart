@@ -1,4 +1,6 @@
-
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
 // ignore_for_file: avoid_print
 
 import 'dart:typed_data';
@@ -34,7 +36,7 @@ class _ImagePageState extends ConsumerState<ImagePage> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    ref.read(mediaServiceProvider.notifier).readData(widget.courseData.uuid!, ['png', 'jpg']);
+    ref.read(mediaServiceProvider.notifier).readData(widget.courseData.uuid!, mediaImageFormats);
   }
 
   @override

@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/media/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharingSameAccount/presentation/widgets/mobile_qr_code_scanner_d2d_same_account.dart';
 import 'package:flutterfrontenduniprojectmanager/router/router.dart';
-
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
 class NumberOfFilesThatDoesntExistLocallySheet extends ConsumerStatefulWidget {
   const NumberOfFilesThatDoesntExistLocallySheet({super.key, required this.media});
 

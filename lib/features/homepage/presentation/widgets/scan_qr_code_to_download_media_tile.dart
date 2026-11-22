@@ -4,7 +4,9 @@ import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSha
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/widgets/scan_qr_code_d2d_different_account.dart';
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/services/ClientSide/device_to_device_different_account_service.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/card_style.dart';
-
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
 class ScanQrCodeToDownloadMediaTile extends ConsumerWidget {
   const ScanQrCodeToDownloadMediaTile({super.key});
   

@@ -6,7 +6,9 @@ import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSha
 import 'package:flutterfrontenduniprojectmanager/features/DeviceToDeviceMediaSharing/presentation/widgets/sheet_course_page.dart';
 import 'package:flutterfrontenduniprojectmanager/router/router.dart';
 
-
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
 typedef SaveLocation = ({String semesterUuid, String courseUuid});
 
 class ChoosingLocationToSaveMediaSheet extends ConsumerStatefulWidget {

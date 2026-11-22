@@ -5,7 +5,9 @@ import 'package:flutterfrontenduniprojectmanager/core/database/local/db/main_db.
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/deviceTokensManagment/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:logger/logger.dart';
-
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
 class WritingDeviceToken extends Notifier<void> {
   AppDatabase? db;
   late Logger logger;

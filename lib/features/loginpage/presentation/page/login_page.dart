@@ -4,7 +4,9 @@ import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation/widgets/form.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation/widgets/graduate_lottie.dart';
 import 'package:flutterfrontenduniprojectmanager/features/loginpage/presentation/widgets/loginText.dart';
-
+// Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
+// Licensed under the PolyForm Noncommercial License 1.0.0.
+// See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
 
 
 class LoginPage extends ConsumerStatefulWidget {
