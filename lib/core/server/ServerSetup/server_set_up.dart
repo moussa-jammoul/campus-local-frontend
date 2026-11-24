@@ -26,7 +26,7 @@ import 'package:network_info_plus/network_info_plus.dart';
 
 
 ///HOW to use this service ? if u are building a feature that require to start a server process ,
-///some points should be clear , your job is to call start process in a certain service (which handle the multi cast dns , 
+///some points should be clear , your job is to call start process in a certain service ( 
 ///qr code generation , identity generation ,request route..) , grab its returned value
 ///and use them , and use stop process to stop the server , but you should also clear the leftover inside the service
 ///you are building  (e.g clearing the qr code data)  , + you should add in "request_router_service" a new member function

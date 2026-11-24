@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable
+// ignore_for_file: avoid_print, unused_local_variable
 // Required Notice: Copyright 2026 Moussa Jammoul (https://github.com/moussa-jammoul/campus-local-frontend)
 // Licensed under the PolyForm Noncommercial License 1.0.0.
 // See LICENSE.md in the project root or https://polyformproject.org/licenses/noncommercial/1.0.0 for full terms.
@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/form.dart';
 import 'package:flutterfrontenduniprojectmanager/core/database/local/providersAndForms/semester/semester_provider.dart';
+import 'package:flutterfrontenduniprojectmanager/core/log/logger_provider.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/presentation/widgets/card_style.dart';
 import 'package:flutterfrontenduniprojectmanager/features/homepage/service/home_page_services.dart';
 import 'package:go_router/go_router.dart';
@@ -417,6 +418,7 @@ class _SemesterTile extends ConsumerWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () {
+            
             context.go('/home/courses' , extra: semester);
              
           },

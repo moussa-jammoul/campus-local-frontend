@@ -103,7 +103,18 @@ final routerProvider = Provider<GoRouter>((ref){
             GoRoute(
               path:'courses',
               builder : (context , state){
-                final semester = state.extra as Semester;
+                
+                final extra = state.extra;
+                ///for some unkown reason , when we click at semester at the app startup , 
+                ///go router behave with semester as a _Map<String, dynamic> , and fail to parse it to "semester" back again,
+                ///so right now i handled this case by manually turning back the map to "semester" object when failing ,
+                ///it is not the final solution , just a guard ,until we know the route of the problem which caused this failure.
+                ///it is safe to use fromjson here because the semester object also have tojson method with the same keys 
+
+                final semester = extra is Semester
+                      ? extra
+                      : Semester.fromJson(extra as Map<String, dynamic>);
+                
                 return CoursesPage(semester: semester);
               },
               routes: [
